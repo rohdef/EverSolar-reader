@@ -1,9 +1,9 @@
 thesis:
-	pdflatex thesis.tex
+	pdflatex -shell-escape thesis.tex
 #	bibtex A
 #	bibtex B
 	bibtex thesis
-	pdflatex thesis.tex
+	pdflatex -shell-escape thesis.tex
 #	latex thesis.tex
 #	dvips -t letter -o thesis.tmp thesis.dvi
 #	mv -f thesis.tmp thesis.ps
