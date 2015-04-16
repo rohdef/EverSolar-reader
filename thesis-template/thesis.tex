@@ -1,0 +1,125 @@
+\documentclass[twoside,11pt,openright,a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[labeled]{multibib}
+\usepackage{color}
+\usepackage{datetime}
+\usepackage{epstopdf}
+\usepackage{titling}
+
+\newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
+
+\makeatletter
+\newcommand\csAdvisor[1]{\renewcommand\@csAdvisor{#1}}
+\newcommand\@csAdvisor{\@latex@error{No \noexpand\csAdvisor given}\@ehc}
+
+\pretitle{
+  \pagestyle{empty}
+  \pagenumbering{roman}
+  \noindent{\rule{\linewidth}{1mm}\\[1ex]}
+  \begin{center}
+  \Huge\sf
+}
+\posttitle{
+  \end{center}
+}
+%\preauthor{}
+\postauthor{
+  \end{tabular}
+  \\[2ex]
+  \noindent\rule{\linewidth}{1mm}\\[4ex]
+  \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex]}
+  \end{center}
+}
+%\predate{}
+\postdate{
+  \\[1em]
+  {\large Advisor: \@csAdvisor}
+  \end{center}
+  \begin{bottompar}
+  \epsfig{file=logo.eps}
+  \end{bottompar}
+}
+\makeatother
+
+\newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
+
+%\newcites{A,B}{Primary Bibliography,Secondary Bibliography}
+
+% see http://imf.au.dk/system/latex/bog/
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Fiktivus Maximus - 200012345}
+\csAdvisor{Anders Møller}
+\title{Something Interesting In Computer Science}
+\pagestyle{empty}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{plain}
+\setcounter{page}{1}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\todo{in English\dots}
+
+\chapter*{Resum\'e}
+\addcontentsline{toc}{chapter}{Resum\'e}
+
+\todo{in Danish\dots}
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+\todo{\dots}
+
+\vspace{2ex}
+\begin{flushright}
+  \emph{Karsken Bælg,}\\
+  \emph{Aarhus, \today.}
+\end{flushright}
+
+\tableofcontents
+\pagenumbering{arabic}
+\setcounter{secnumdepth}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\label{ch:intro}
+
+\todo{\dots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{\todo{\dots}}
+\label{ch:main}
+
+\todo{example of a citation to primary literature: \cite{lazypropagation2010},
+and one to secondary literature: \cite{ambiguity2010}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\todo{\dots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\addcontentsline{toc}{chapter}{Primary Bibliography}
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
+
