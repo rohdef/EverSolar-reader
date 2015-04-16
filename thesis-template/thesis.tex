@@ -1,4 +1,5 @@
-\documentclass[twoside,11pt,openright,a4paper]{report}
+%\documentclass[twoside,11pt,openright,a4paper]{report}
+\documentclass[a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[american]{babel}
@@ -13,6 +14,8 @@
 \usepackage{datetime}
 \usepackage{epstopdf}
 \usepackage{titling}
+\usepackage{listings}
+\usepackage{minted}
 
 \newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
 
@@ -51,16 +54,18 @@
 
 \newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
 
-%\newcites{A,B}{Primary Bibliography,Secondary Bibliography}
+\usepackage{hyperref}
 
-% see http://imf.au.dk/system/latex/bog/
+\hypersetup{
+    pdfborder = {0 0 0}
+}
 
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\author{Fiktivus Maximus - 200012345}
-\csAdvisor{Anders Møller}
-\title{Something Interesting In Computer Science}
+\author{Kasper Lynderup - 20105319\\Timothi Hansen - 201303516\\Rohde Fischer - 20052356}
+\csAdvisor{Niels Olof Bouvin}
+\title{Using solar panels to deduce weather}
 \pagestyle{empty}
 \maketitle
 
@@ -123,3 +128,8 @@ and one to secondary literature: \cite{ambiguity2010}}
 
 \end{document}
 
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-command-extra-options: "-shell-escape"
+%%% TeX-master: t
+%%% End:
