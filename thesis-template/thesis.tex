@@ -9,6 +9,7 @@
 \usepackage{epsfig}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{natbib}
 \usepackage[labeled]{multibib}
 \usepackage{color}
 \usepackage{datetime}
@@ -81,18 +82,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
+\input{intro.tex}
 
-\todo{\dots}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{\todo{\dots}}
-\label{ch:main}
-
-\todo{example of a citation to primary literature: \cite{lazypropagation2010},
-and one to secondary literature: \cite{ambiguity2010}}
+\section{Related work}
+\input{related.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Acknowledgments}
+\todo{Bouvin supervisor, Karl Fischer - chemist}
 
 \section{Conclusion}
 \label{ch:conclusion}
@@ -102,7 +100,7 @@ and one to secondary literature: \cite{ambiguity2010}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\addcontentsline{toc}{chapter}{Primary Bibliography}
-\bibliographystyle{plain}
+\bibliographystyle{alpha}
 \bibliography{refs}
 
 \end{document}
