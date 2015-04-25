@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import urllib.request
 import json
 import sqlite3
@@ -7,10 +8,16 @@ import time
 import sys
 import traceback
 import logging
-from daemon import runne
+from daemon import runner
+
+# Note there's a bug in
+# /usr/local/lib/python3.4/dist-packages/daemon/runner.py
+# correct the lines for stdout_path and stdout_err to:
+# open(..., 'a+', 1)
 
 class App():
     def __init__(self):
+        logger.info("Initializing OpenWeatherMap logger")
         self.conn = None
         self.cursor = None
 
@@ -20,15 +27,23 @@ class App():
 
         self.aarhus_chords = (56.15674, 10.21076)
 
+        # Daemon config
+        self.stdin_path = '/dev/null'
+        self.stdout_path = '/var/log/openweather/out.log'
+        self.stderr_path = '/var/log/openweather/err.log'
+        self.pidfile_path =  '/var/run/openweather/openweather.pid'
+        self.pidfile_timeout = 5
 
     def run(self):
+        logger.info("Starting OpenWeatherMap logger")
         while True:
+            logger.info("\tFetching data")
             try:
                 try:
                     self.databasePre()
                     self.getData()
                 except:
-                    print("Unexpected error: ", sys.exc_info()[0])
+                    logger.error("Unexpected error: ", sys.exc_info()[0])
                     traceback.print_exc()
                 self.databasePost()
             except:
@@ -38,20 +53,21 @@ class App():
             time.sleep(1800)
 
     def databasePre(self):
-        self.conn = sqlite3.connect('openWeather.db')
-        self.cursor = conn.cursor()
+        self.conn = sqlite3.connect('/var/log/openweather/openWeather.db')
+        self.cursor = self.conn.cursor()
 
-        createFile = open('create_openweather.sql', 'r')
-        cursor.execute(createFile.read())
+        logger.info("Loading db")
+        createFile = open('/home/rohdef/git/EverSolar-reader/logger/create_openweather.sql', 'r')
+        self.cursor.execute(createFile.read())
         createFile.close()
-        conn.commit()
+        self.conn.commit()
 
     def databasePost(self):
         self.conn.close()
 
     # Data specification found at:
     # http://openweathermap.org/weather-data#current
-    def getData():
+    def getData(self):
         requestUrl = self.openWeatherMapUrl.format(self.aarhus_chords[0], self.aarhus_chords[1], self.units, self.api_key)
         gotData = False
 
@@ -144,18 +160,19 @@ class App():
                             weatherIcon,
                             base))
             self.conn.commit()
+            logger.info("Data logged")
 
-if __name__ == '__main__':
-    a = App()
-    a.main()
+#if __name__ == '__main__':
+#    a = App()
+#    a.main()
 
-app = App()
-logger = logging.getLogger("DaemonLog")
-logger.setLevel(logging.WARNING)
+logger = logging.getLogger("OpenWeatherMap")
+logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler = logging.FileHandler("/var/log/testdaemon/testdaemon.log")
+handler = logging.FileHandler("/var/log/openweather/run.log")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+app = App()
 
 daemon_runner = runner.DaemonRunner(app)
 #This ensures that the logger file handle does not get closed during daemonization

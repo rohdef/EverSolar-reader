@@ -55,3 +55,19 @@ docs/_build/
 
 # PyBuilder
 target/
+
+
+# LaTeX
+/thesis-template/*.aux
+/thesis-template/*.bbl
+/thesis-template/*.blg
+/thesis-template/*.out
+/thesis-template/*.pyg
+/thesis-template/*.toc
+/thesis-template/*.pdf
+/thesis-template/auto
+
+
+# Non-public references
+references/mpp*.pdf
+references/citysensors.pdf
