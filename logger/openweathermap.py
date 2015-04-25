@@ -22,10 +22,12 @@ class App():
         self.cursor = None
 
         self.openWeatherMapUrl = "http://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&units={2}&APPID={3}"
-        self.api_key = "93a3e42c05923d726e91b6c5b0da386d"
+        self.api_key = ""
         self.units = "metric"
 
-        self.aarhus_chords = (56.15674, 10.21076)
+        self.aarhus_coords = (56.15674, 10.21076)
+        self.skanderborg_coords = (56.063696, 9.994724)
+        self.moensted_coods = (56.443901, 9.194299)
 
         # Daemon config
         self.stdin_path = '/dev/null'
@@ -41,7 +43,8 @@ class App():
             try:
                 try:
                     self.databasePre()
-                    self.getData()
+                    self.getData(self.skanderborg_coords)
+                    self.getData(self.moensted_coords)
                 except:
                     logger.error("Unexpected error: ", sys.exc_info()[0])
                     traceback.print_exc()
@@ -67,8 +70,8 @@ class App():
 
     # Data specification found at:
     # http://openweathermap.org/weather-data#current
-    def getData(self):
-        requestUrl = self.openWeatherMapUrl.format(self.aarhus_chords[0], self.aarhus_chords[1], self.units, self.api_key)
+    def getData(self, coords):
+        requestUrl = self.openWeatherMapUrl.format(coords[0], coords[1], self.units, self.api_key)
         gotData = False
 
         while not gotData:
