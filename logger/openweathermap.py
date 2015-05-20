@@ -22,12 +22,12 @@ class App():
         self.cursor = None
 
         self.openWeatherMapUrl = "http://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&units={2}&APPID={3}"
-        self.api_key = ""
+        self.api_key = "93a3e42c05923d726e91b6c5b0da386d"
         self.units = "metric"
 
         self.aarhus_coords = (56.15674, 10.21076)
         self.skanderborg_coords = (56.063696, 9.994724)
-        self.moensted_coods = (56.443901, 9.194299)
+        self.moensted_coords = (56.443901, 9.194299)
 
         # Daemon config
         self.stdin_path = '/dev/null'
@@ -59,7 +59,7 @@ class App():
         self.conn = sqlite3.connect('/var/log/openweather/openWeather.db')
         self.cursor = self.conn.cursor()
 
-        logger.info("Loading db")
+        logger.info("\tLoading db")
         createFile = open('/home/rohdef/git/EverSolar-reader/logger/create_openweather.sql', 'r')
         self.cursor.execute(createFile.read())
         createFile.close()
@@ -79,49 +79,49 @@ class App():
                 response = urllib.request.urlopen(requestUrl)
                 gotData = True
             except:
-                logger.warn("Error getting data, sleeping for two mins")
+                logger.warn("\t\tError getting data, sleeping for two mins")
                 time.sleep(120)
 
-            obj = json.loads(response.readall().decode('utf-8'))
+        obj = json.loads(response.readall().decode('utf-8'))
 
-            # Unix time GMT according to spec
-            recieveTime = obj.get("dt")
+        # Unix time GMT according to spec
+        recieveTime = obj.get("dt")
 
-            # City name
-            cityName = obj.get("name")
-            coord = (obj.get("coord").get("lat"), obj.get("coord").get("lon"))
+        # City name
+        cityName = obj.get("name")
+        coord = (obj.get("coord").get("lat"), obj.get("coord").get("lon"))
 
-            sunrise = obj.get("sys").get("sunrise")
-            sunset = obj.get("sys").get("sunset")
+        sunrise = obj.get("sys").get("sunrise")
+        sunset = obj.get("sys").get("sunset")
 
-            main = obj.get("main")
-            temperature = main.get("temp")
-            humidity = main.get("humidity")
-            pressure = main.get("pressure")
-            pressure_sea_level = main.get("sea_level")
-            pressure_gnd_level = main.get("grnd_level")
+        main = obj.get("main")
+        temperature = main.get("temp")
+        humidity = main.get("humidity")
+        pressure = main.get("pressure")
+        pressure_sea_level = main.get("sea_level")
+        pressure_gnd_level = main.get("grnd_level")
 
-            windSpeed = obj.get("wind").get("speed")
-            windDeg = obj.get("wind").get("deg")
-            windGust = obj.get("wind").get("gust")
-            if not windGust:
-                windGust = windSpeed
+        windSpeed = obj.get("wind").get("speed")
+        windDeg = obj.get("wind").get("deg")
+        windGust = obj.get("wind").get("gust")
+        if not windGust:
+            windGust = windSpeed
 
-            clouds = obj.get("clouds").get("all")
+        clouds = obj.get("clouds").get("all")
 
-            weather = obj.get("weather")[0]
-            weatherId = weather.get("id")
-            weatherMain = weather.get("main")
-            weatherDescription = weather.get("description")
-            weatherIcon = weather.get("icon")
+        weather = obj.get("weather")[0]
+        weatherId = weather.get("id")
+        weatherMain = weather.get("main")
+        weatherDescription = weather.get("description")
+        weatherIcon = weather.get("icon")
 
-            # Undocumented, probably just tells us where the data comes from
-            # Will monitor just in case
-            base = obj.get("base")
-            if not base:
-                base = "Unknown"
+        # Undocumented, probably just tells us where the data comes from
+        # Will monitor just in case
+        base = obj.get("base")
+        if not base:
+            base = "Unknown"
 
-            self.cursor.execute('''INSERT INTO openweather (recievetime,
+        self.cursor.execute('''INSERT INTO openweather (recievetime,
                                                cityname,
                                                latitude,
                                                longitude,
@@ -142,28 +142,28 @@ class App():
                                                weatherIcon,
                                                base)
                                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                           (recieveTime,
-                            cityName,
-                            coord[0],
-                            coord[1],
-                            sunrise,
-                            sunset,
-                   temperature,
-                            humidity,
-                            pressure,
-                            pressure_sea_level,
-                            pressure_gnd_level,
-                            windSpeed,
-                            windDeg,
-                            windGust,
-                            clouds,
-                            weatherId,
-                            weatherMain,
-                            weatherDescription,
-                            weatherIcon,
-                            base))
-            self.conn.commit()
-            logger.info("Data logged")
+                            (recieveTime,
+                             cityName,
+                             coord[0],
+                             coord[1],
+                             sunrise,
+                             sunset,
+                             temperature,
+                             humidity,
+                             pressure,
+                             pressure_sea_level,
+                             pressure_gnd_level,
+                             windSpeed,
+                             windDeg,
+                             windGust,
+                             clouds,
+                             weatherId,
+                             weatherMain,
+                             weatherDescription,
+                             weatherIcon,
+                             base))
+        self.conn.commit()
+        logger.info("\t\tData logged")
 
 #if __name__ == '__main__':
 #    a = App()

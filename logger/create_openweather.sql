@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS openweather (
-        recievetime INTEGER PRIMARY KEY,
+        recievetime INTEGER NOT NULL,
         cityName TEXT NOT NULL,
         latitude REAL NOT NULL,
         longitude REAL NOT NULL,
