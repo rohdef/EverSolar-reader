@@ -44,6 +44,7 @@ function filter(data) {
 function diagram(data) {
     var openWeather = filter(data.openWeather);
     var everSolar = filter(data.everSolar);
+    var optimal = filter(data.optimal);
 
     $("#Diagram").empty();
     var margin = 40;
@@ -53,6 +54,7 @@ function diagram(data) {
 
     var effectColor = "green";
     var weatherColor = "red";
+    var optimalColor = "blue";
 
     var timeStart = Math.min(d3.min(openWeather, function(d) {
                                  return d.time;
@@ -102,11 +104,19 @@ function diagram(data) {
                          return hasData(everSolar, d.time);
                      });
 
+    var optimalLine = d3.svg.line()
+                     .x(function(d) { return timeScale(new Date(d.time)); })
+                     .y(function(d) { return effectScale(d.max); })
+                     .defined(function(d) {
+                         return hasData(optimal, d.time);
+                     });
+
     var weatherLine = d3.svg.line()
                       .x(function(d) { return timeScale(new Date(d.time)); })
                       .y(function(d) { return weatherScale(d.clouds); })
                       .defined(function(d) {
-                          return hasData(openWeather, d.time);
+                          var bool = (hasData(openWeather, d.time) && notNight(new Date(d.time)))
+                          return bool;
                       });
 
     var svg = d3.select("#Diagram").append("svg")
@@ -151,7 +161,13 @@ function diagram(data) {
     svg.append("path")
     .attr("class", "line")
     .style("stroke", effectColor)
-    .attr("d", effectLine(everSolar));    
+    .attr("d", effectLine(everSolar));
+
+    svg.append("path")
+    .attr("class", "line")
+    .style("stroke", optimalColor)
+    .attr("d", optimalLine(optimal));
+
 }
 
 function total(data) {
@@ -296,6 +312,10 @@ function hasData(data, d) {
     } else {
         return false;
     }
+}
+
+function notNight(time) {
+    return (5 < time.getHours() && time.getHours() < 21)
 }
 
 function scatter(data) {

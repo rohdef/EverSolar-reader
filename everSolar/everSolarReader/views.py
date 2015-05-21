@@ -14,7 +14,8 @@ def script(request):
 def data(request):
     data = json.dumps({
         "openWeather" : history.getWeatherData(),
-        "everSolar" : history.getPVdata(30)
+        "everSolar" : history.getAverage(),
+        "optimal" : history.getOptimal(),
     })
     return HttpResponse(data,content_type='application/json')
 

@@ -87,6 +87,14 @@ DATABASES = {
     'openWeather': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'openWeather.db'),
+    },
+    'postgres': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+        'NAME': 'everSolar', 
+        'USER': 'postgres',
+        'PASSWORD': 'q6EXUag2',
+        'HOST': 'creepy.rohdef.dk',
+        'PORT': '',
     }
 }
 

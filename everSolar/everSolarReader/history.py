@@ -142,3 +142,33 @@ def getAverageClouds():
         dayData.append([time, d[1]])
     
     return resData
+
+
+def getOptimal():
+    cursor = connections['postgres'].cursor()
+    cursor.execute("SELECT start_time, max FROM differences_from_max ORDER BY start_time")
+    data = cursor.fetchall()
+
+    resData = []
+    for d in data:
+        resData.append({
+            "time" : round(d[0].timestamp() * 1000),
+            "max" : int(d[1]),
+        })
+    
+    return resData
+
+
+def getAverage():
+    cursor = connections['postgres'].cursor()
+    cursor.execute("SELECT start_time, avg_effect FROM differences_from_max ORDER BY start_time")
+    data = cursor.fetchall()
+
+    resData = []
+    for d in data:
+        resData.append({
+            "time" : round(d[0].timestamp() * 1000),
+            "output" : int(d[1]),
+        })
+    
+    return resData
