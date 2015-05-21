@@ -52,13 +52,13 @@ def getPVdata(averageInterval):
 def getWeatherData():
     cursor = connections['openWeather'].cursor()
     cursor.execute("SELECT recievetime, clouds FROM openweather "
-                    + "WHERE cityName = 'Stoholm' OR cityName = 'Karup'")
+                    + "WHERE cityName = 'Stoholm' OR cityName = 'Karup' ORDER BY recievetime")
     data = cursor.fetchall()
     
     resData = []
 
     for d in data:
-        resData.append({"time": d[0] * 1000, "clouds": d[1]})
+        resData.append({"time": (d[0]) * 1000, "clouds": d[1]})
 
     return resData
 
@@ -125,13 +125,13 @@ def getAverageClouds():
             number = 0
 
             for e in dayData:
-                if (6 <= e[0].hour <= 21):
+                if (8 <= e[0].hour <= 20):
                     sum += e[1]
                     number += 1
 
             delta = timedelta(hours = day.hour, minutes = day.minute, seconds = day.second)
             resData.append({
-                "time": round((day - delta).timestamp() * 1000),
+                "time": round(((day - delta).timestamp()) * 1000),
                 "clouds": round(sum / number)
             })
 
@@ -146,7 +146,7 @@ def getAverageClouds():
 
 def getOptimal():
     cursor = connections['postgres'].cursor()
-    cursor.execute("SELECT start_time, max FROM differences_from_max ORDER BY start_time")
+    cursor.execute("SELECT start_time, max FROM differences_from_60_max ORDER BY start_time")
     data = cursor.fetchall()
 
     resData = []
@@ -161,7 +161,7 @@ def getOptimal():
 
 def getAverage():
     cursor = connections['postgres'].cursor()
-    cursor.execute("SELECT start_time, avg_effect FROM differences_from_max ORDER BY start_time")
+    cursor.execute("SELECT start_time, avg_effect FROM differences_from_60_max ORDER BY start_time")
     data = cursor.fetchall()
 
     resData = []
@@ -169,6 +169,20 @@ def getAverage():
         resData.append({
             "time" : round(d[0].timestamp() * 1000),
             "output" : int(d[1]),
+        })
+    
+    return resData
+
+def getDiff(interval):
+    cursor = connections['postgres'].cursor()
+    cursor.execute("SELECT start_time, fraction FROM differences_from_" + str(interval) + "_max WHERE avg_effect > 23 ORDER BY start_time")
+    data = cursor.fetchall()
+
+    resData = []
+    for d in data:
+        resData.append({
+            "time" : round(d[0].timestamp() * 1000),
+            "diff" : float(d[1]) * 100,
         })
     
     return resData

@@ -25,3 +25,24 @@ def total(request):
         "everSolar": history.getTotalProductionPerDay()
     })
     return HttpResponse(data,content_type='application/json')
+
+def diff30(request):
+    data = json.dumps({
+        "diff" : history.getDiff(30),
+        "openWeather" : history.getWeatherData(),
+    })
+    return HttpResponse(data,content_type='application/json')
+
+def diff60(request):
+    data = json.dumps({
+        "diff" : history.getDiff(60),
+        "openWeather" : history.getWeatherData(),
+    })
+    return HttpResponse(data,content_type='application/json')
+
+def diff180(request):
+    data = json.dumps({
+        "diff" : history.getDiff(180),
+        "openWeather" : history.getWeatherData(),
+    })
+    return HttpResponse(data,content_type='application/json')
