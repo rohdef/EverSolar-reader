@@ -4,51 +4,36 @@ function init() {
     $("#days").change(update);
     update();
 }
+function ajaxCall(path, callback) {    
+    $.ajax({
+        url: path,
+        type: "GET",
+        ContentType: "application/json"
+    }).success(function(data) {
+        callback(data);
+    }).error(function(data) {});
 
+}
 function update() {
-
-    $.ajax({
-        url: "/data",
-        type: "GET",
-        ContentType: "application/json"
-    }).success(function(data) {
-        diagram(data);
-    }).error(function(data) {});
-
-    $.ajax({
-        url: "/total",
-        type: "GET",
-        ContentType: "application/json"
-    }).success(function(data) {
+    ajaxCall("/data",diagram);
+    ajaxCall("/total",function(data){
         total(data);
-        totalScatter(data)
-    }).error(function(data) {});
+        totalScatter(data);
+    });
 
-    $.ajax({
-        url: "/diff30",
-        type: "GET",
-        ContentType: "application/json"
-    }).success(function(data) {
-        scatter30(data);
-    }).error(function(data) {});
+    ajaxCall("/diff30",function(data) {
+        scatter(data, "#Scatter30", 30);
+    });
 
-    $.ajax({
-        url: "/diff60",
-        type: "GET",
-        ContentType: "application/json"
-    }).success(function(data) {
+    ajaxCall("/diff60",function(data) {
+        scatter(data, "#Scatter60", 60);
         diff(data);
-        scatter60(data);
-    }).error(function(data) {});
+    });
 
-    $.ajax({
-        url: "/diff180",
-        type: "GET",
-        ContentType: "application/json"
-    }).success(function(data) {
-        scatter180(data);
-        diffFullData(data);
-    }).error(function(data) {});
+    ajaxCall("/diff180",function(data){
+        scatter(data, "#Scatter180", 180);
+        //diffFullData(data);
+    });
 }
 
 
@@ -113,13 +98,113 @@ function filter(data) {
 
     return res;
 }
+function getTimeScale(start, end, data) {
+    var timeStart = d3.min(data, function(d) {
+                        return d3.min(d, function(t) {
+                                   return t.time;
+                               });
+                    })
+
+    var timeEnd = d3.max(data, function(d) {
+                      return d3.max(d, function(t) {
+                                 return t.time;
+                             });
+                  })
+    var timeScale = d3.time.scale();
+    timeScale.range([start, end]);
+    timeScale.domain([new Date(timeStart - 1), new Date(timeEnd + 1)]);
+    timeScale.nice(d3.time.day);
+    return timeScale;
+}
+
+function getLinearScale(start, end, data, getPoint) {
+    var scale = d3.scale.linear();
+    scale.range([start, end]);
+    scale.domain([0, d3.max(data, getPoint)]);
+    return scale;
+}
+
+function getSvg(selector, width, height, margin) {
+    $(selector).empty();
+    var svg = d3.select(selector).append("svg")
+              .attr("width", width + 2 * margin)
+              .attr("height", height + 2 * margin)
+              .append("g")
+              .attr("transform", "translate(" + margin + "," + margin + ")");
+    return svg;
+}
+
+function appendAxis(svg, width, height, scale, color, orient, text){
+
+    var translate;
+    var x;
+    var y;
+    var anchor;
+
+    switch(orient) {
+      case "left":
+        translate = "";
+        x = 0;
+        y = -10
+        anchor = "end"
+        break;
+      case "buttom":
+        translate = "translate(0," + height + ")"
+        x = width;
+        y = 30
+        anchor = "end"
+        break;
+      case "right":
+        translate = "translate(" + width + ",0)"
+        x = 0;
+        y = -10;
+        anchor = "start"
+    }
+
+
+    var axis = d3.svg.axis()
+               .scale(scale)
+               .orient(orient);
+//.ticks(d3.time.day, 1)
+
+    svg.append("g")
+    .attr("class", "axis")
+    .style("fill", color)
+    .attr("transform", translate)
+    .call(axis)
+    .append("text")
+    .attr("x", x)
+    .attr("y", y)
+    .attr("text-anchor", anchor)
+    .text(text);
+
+}
+
+function appendLine(svg, color, xScale, yScale, data, getx, gety, defined) {
+
+    var line = d3.svg.line()
+               .x(function(d) { return xScale(getx(d)); })
+               .y(function(d) { return yScale(gety(d)); })
+               .defined(defined);
+
+
+    svg.append("path")
+    .attr("class", "line")
+    .style("stroke", color)
+    .attr("d", line(data));
+}
+
+function appendTimeLine(svg, color, timeScale, yScale, data, gety, defined) {
+    appendLine(svg, color, timeScale, yScale, data,
+               function(d) { return new Date(d.time) },
+               gety, defined)
+}
 
 function diagram(data) {
     var openWeather = filter(data.openWeather);
     var everSolar = filter(data.everSolar);
     var optimal = filter(data.optimal);
 
-    $("#Diagram").empty();
     var margin = 40;
 
     var width = $(window).width() - 200;
@@ -129,118 +214,29 @@ function diagram(data) {
     var weatherColor = "red";
     var optimalColor = "blue";
 
-    var timeStart = Math.min(d3.min(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.min(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar, optimal]);
+    var effectScale = getLinearScale(height, 0, everSolar, function(d) { return d.output; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
 
-    var timeEnd = Math.max(d3.max(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.max(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var svg = getSvg("#Diagram", width, height, margin);
 
-    var timeScale = d3.time.scale();
-    timeScale.range([0, width]);
-    timeScale.domain([new Date(timeStart), new Date(timeEnd)]);
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, effectScale, effectColor, "left", "Effect")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
-    var effectScale = d3.scale.linear();
-    effectScale.range([height, 0]);
-    effectScale.domain([0, d3.max(everSolar, function(d) {
-                               return d.output;
-                           })]);
 
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([height, 0]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
+    appendTimeLine(svg, weatherColor, timeScale, weatherScale, openWeather,
+                   function(d) { return d.clouds; },
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         notNight(new Date(d.time)))});
 
-    var timeAxis = d3.svg.axis()
-                   .scale(timeScale)
-                   .ticks(d3.time.day, 1)
-                   .orient("buttom");
+    appendTimeLine(svg, optimalColor, timeScale, effectScale, optimal,
+                   function(d) { return d.max},
+                   function(d) { return hasData(optimal, d.time); });
 
-    var effectAxis = d3.svg.axis()
-                     .scale(effectScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("right");
-    
-    var effectLine = d3.svg.line()
-                     .x(function(d) { return timeScale(new Date(d.time)); })
-                     .y(function(d) { return effectScale(d.output); })
-                     .defined(function(d) {
-                         return hasData(everSolar, d.time);
-                     });
-
-    var optimalLine = d3.svg.line()
-                     .x(function(d) { return timeScale(new Date(d.time)); })
-                     .y(function(d) { return effectScale(d.max); })
-                     .defined(function(d) {
-                         return hasData(optimal, d.time);
-                     });
-
-    var weatherLine = d3.svg.line()
-                      .x(function(d) { return timeScale(new Date(d.time)); })
-                      .y(function(d) { return weatherScale(d.clouds); })
-                      .defined(function(d) {
-                          var bool = (hasData(openWeather, d.time) && notNight(new Date(d.time)))
-                          return bool;
-                      });
-
-    var svg = d3.select("#Diagram").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(timeAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Time");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .style("fill", effectColor)
-    .call(effectAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Effect");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)")
-    .style("fill", weatherColor)
-    .call(weatherAxis)
-    .append("text")
-    .attr("y", -10)
-    .text("Clouds");
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", weatherColor)
-    .attr("d", weatherLine(openWeather));
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", effectColor)
-    .attr("d", effectLine(everSolar));
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", optimalColor)
-    .attr("d", optimalLine(optimal));
-
+    appendTimeLine(svg, effectColor, timeScale, effectScale, everSolar,
+                   function(d) { return d.output},
+                   function(d) { return hasData(everSolar, d.time); });
 }
 
 
@@ -248,7 +244,6 @@ function diffFullData(data) {
     var openWeather = filter(data.openWeather);
     var everSolar = filter(data.diff);
 
-    $("#DiffFullData").empty();
     var margin = 40;
 
     var width = $(window).width() - 200;
@@ -257,106 +252,25 @@ function diffFullData(data) {
     var diffColor = "green";
     var weatherColor = "red";
 
-    var timeStart = Math.min(d3.min(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.min(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar]);
+    var diffScale = getLinearScale(height, 0, everSolar, function(d) { return d.diff; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
 
-    var timeEnd = Math.max(d3.max(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.max(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var svg = getSvg("#DiffFullData", width, height, margin);
 
-    var timeScale = d3.time.scale();
-    timeScale.range([0, width]);
-    timeScale.domain([new Date(timeStart), new Date(timeEnd)]);
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, diffScale, diffColor, "left", "Effect")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
-    var diffScale = d3.scale.linear();
-    diffScale.range([height, 0]);
-    diffScale.domain([0, d3.max(everSolar, function(d) {
-                               return d.diff;
-                           })]);
 
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([height, 0]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
+    appendTimeLine(svg, weatherColor, timeScale, weatherScale, openWeather,
+                   function(d) { return d.clouds; },
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         notNight(new Date(d.time)))});
 
-    var timeAxis = d3.svg.axis()
-                   .scale(timeScale)
-                   .ticks(d3.time.day, 1)
-                   .orient("buttom");
-
-    var diffAxis = d3.svg.axis()
-                     .scale(diffScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("right");
-    
-    var diffLine = d3.svg.line()
-                     .x(function(d) { return timeScale(new Date(d.time)); })
-                     .y(function(d) { return diffScale(d.diff); })
-                     .defined(function(d) {
-                         return hasDataTime(everSolar, d.time, 11000000);
-                     });
-
-    var weatherLine = d3.svg.line()
-                      .x(function(d) { return timeScale(new Date(d.time)); })
-                      .y(function(d) { return weatherScale(d.clouds); })
-                      .defined(function(d) {
-                          var bool = (hasData(openWeather, d.time) && notNight(new Date(d.time)))
-                          return bool;
-                      });
-
-    var svg = d3.select("#DiffFullData").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(timeAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Time");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .style("fill", diffColor)
-    .call(diffAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Effect");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)")
-    .style("fill", weatherColor)
-    .call(weatherAxis)
-    .append("text")
-    .attr("y", -10)
-    .text("Clouds");
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", weatherColor)
-    .attr("d", weatherLine(openWeather));
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", diffColor)
-    .attr("d", diffLine(everSolar));
-
+    appendTimeLine(svg, diffColor, timeScale, diffScale, everSolar,
+                   function(d) { return d.diff},
+                   function(d) { return hasDataTime(everSolar, d.time, 11000000) });
 }
 
 function diff(data) {
@@ -372,113 +286,32 @@ function diff(data) {
     var diffColor = "green";
     var weatherColor = "red";
 
-    var timeStart = Math.min(d3.min(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.min(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar]);
+    var diffScale = getLinearScale(height, 0, everSolar, function(d) { return d.diff; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
 
-    var timeEnd = Math.max(d3.max(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.max(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var svg = getSvg("#Diff", width, height, margin);
 
-    var timeScale = d3.time.scale();
-    timeScale.range([0, width]);
-    timeScale.domain([new Date(timeStart), new Date(timeEnd)]);
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, diffScale, diffColor, "left", "Effect")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
-    var diffScale = d3.scale.linear();
-    diffScale.range([height, 0]);
-    diffScale.domain([0, d3.max(everSolar, function(d) {
-                               return d.diff;
-                           })]);
 
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([height, 0]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
+    appendTimeLine(svg, weatherColor, timeScale, weatherScale, openWeather,
+                   function(d) { return d.clouds; },
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         notNight(new Date(d.time)))});
 
-    var timeAxis = d3.svg.axis()
-                   .scale(timeScale)
-                   .ticks(d3.time.day, 1)
-                   .orient("buttom");
-
-    var diffAxis = d3.svg.axis()
-                     .scale(diffScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("right");
-    
-    var diffLine = d3.svg.line()
-                     .x(function(d) { return timeScale(new Date(d.time)); })
-                     .y(function(d) { return diffScale(d.diff); })
-                     .defined(function(d) {
-                         return hasData(openWeather, d.time) && hasData(everSolar, d.time);
-                     });
-
-    var weatherLine = d3.svg.line()
-                      .x(function(d) { return timeScale(new Date(d.time)); })
-                      .y(function(d) { return weatherScale(d.clouds); })
-                      .defined(function(d) {
-                          var bool = (hasData(openWeather, d.time) && notNight(new Date(d.time)))
-                          return bool;
-                      });
-
-    var svg = d3.select("#Diff").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(timeAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Time");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .style("fill", diffColor)
-    .call(diffAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Effect");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)")
-    .style("fill", weatherColor)
-    .call(weatherAxis)
-    .append("text")
-    .attr("y", -10)
-    .text("Clouds");
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", weatherColor)
-    .attr("d", weatherLine(openWeather));
-
-    svg.append("path")
-    .attr("class", "line")
-    .style("stroke", diffColor)
-    .attr("d", diffLine(everSolar));
-
+    appendTimeLine(svg, diffColor, timeScale, diffScale, everSolar,
+                   function(d) { return d.diff},
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         hasData(everSolar, d.time)); });
 }
 
 function total(data) {
     var openWeather = data.openWeather;
     var everSolar = data.everSolar;
 
-    $("#Total").empty();
     var margin = 40;
 
     var width = $(window).width() - 200;
@@ -487,54 +320,11 @@ function total(data) {
     var totalColor = "green";
     var weatherColor = "red";
 
-    var timeStart = Math.min(d3.min(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.min(everSolar, function(d) {
-                                     return d.time;
-                                 }));
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar]);
+    var totalScale = getLinearScale(height, 0, everSolar, function(d) { return d.total; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
 
-    var timeEnd = Math.max(d3.max(openWeather, function(d) {
-                                 return d.time;
-                             }), d3.max(everSolar, function(d) {
-                                     return d.time;
-                                 }));
-
-    var timeScale = d3.time.scale();
-    timeScale.range([0, width]);
-    timeScale.domain([new Date(timeStart - 1 ), new Date(timeEnd + 1)]);
-    timeScale.nice(d3.time.day);
-
-    var totalScale = d3.scale.linear();
-    totalScale.range([height, 0]);
-    totalScale.domain([0, d3.max(everSolar, function(d) {
-                               return d.total;
-                           })]);
-
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([height, 0]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
-
-    var timeAxis = d3.svg.axis()
-                   .scale(timeScale)
-                   .ticks(d3.time.day, 1)
-                   .orient("buttom");
-
-    var totalAxis = d3.svg.axis()
-                     .scale(totalScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("right");
-
-
-    var svg = d3.select("#Total").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
+    var svg = getSvg("#Total", width, height, margin);
 
     var numberOfDays = timeScale.ticks(d3.time.day).length;
     var barWidth = width / (numberOfDays * 2);
@@ -561,73 +351,29 @@ function total(data) {
     .attr("height", function(d) { return height - weatherScale(d.clouds); })
     .attr("fill", weatherColor)
 
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(timeAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Time");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .style("fill", totalColor)
-    .call(totalAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Total");
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)")
-    .style("fill", weatherColor)
-    .call(weatherAxis)
-    .append("text")
-    .attr("y", -10)
-    .text("Clouds");
-
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, totalScale, totalColor, "left", "Total")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 }
 
-function scatter30(data) {
+function scatter(data, selector, interval) {
     var openWeather = data.openWeather;
     var everSolar = data.diff;
 
-    $("#Scatter30").empty();
     var margin = 40;
 
     var width = 500;
     var height = 500;
 
+    var diffScale = getLinearScale(height, 0, everSolar, function(d) { return d.diff; })
+    var weatherScale = getLinearScale(0, width, openWeather, function(d) { return d.clouds; })
 
-    var diffScale = d3.scale.linear();
-    diffScale.range([height, 0]);
-    diffScale.domain([0, d3.max(everSolar, function(d) {
-                             return d.diff;
-                           })]);
+    var svg = getSvg(selector, width, height, margin);
 
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([0, width]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
+    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
+    appendAxis(svg, width, height, diffScale, "black", "left", "Effect")
 
-    var diffAxis = d3.svg.axis()
-                     .scale(diffScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("buttom");
-
-
-    var svg = d3.select("#Scatter30").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
+    var deadTime = (interval * 60 + 1000) * 1000
 
     svg.append("g")
     .attr("class", "dot")
@@ -635,191 +381,15 @@ function scatter30(data) {
     .data(everSolar).enter()
     .append("circle")
     .filter(function(d) {
-        return hasData(openWeather, d.time) && hasData(everSolar, d.time)
+        return (hasDataTime(openWeather, d.time, deadTime) &&
+                hasDataTime(everSolar, d.time, deadTime));
     })
     .attr("cx", function(d) {
-        var clouds = getClouds(openWeather, d.time);
-        if (clouds == undefined) {
-            console.log(new Date(d.time));
-        }
-        return weatherScale(clouds);
+        return weatherScale(getClouds(openWeather, d.time));
     })
     .attr("cy", function(d) { return diffScale(d.diff); })
     .attr("r", 2);
 
-
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .call(diffAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Total");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(weatherAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Clouds");
-}
-
-function scatter60(data) {
-    var openWeather = data.openWeather;
-    var everSolar = data.diff;
-
-    $("#Scatter60").empty();
-    var margin = 40;
-
-    var width = 500;
-    var height = 500;
-
-
-    var diffScale = d3.scale.linear();
-    diffScale.range([height, 0]);
-    diffScale.domain([0, d3.max(everSolar, function(d) {
-                             return d.diff;
-                           })]);
-
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([0, width]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
-
-    var diffAxis = d3.svg.axis()
-                     .scale(diffScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("buttom");
-
-
-    var svg = d3.select("#Scatter60").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
-
-    svg.append("g")
-    .attr("class", "dot")
-    .selectAll("circle")
-    .data(everSolar).enter()
-    .append("circle")
-    .filter(function(d) {
-        return hasData(openWeather, d.time) && hasData(everSolar, d.time)
-    })
-    .attr("cx", function(d) {
-        var clouds = getClouds(openWeather, d.time);
-        if (clouds == undefined) {
-            console.log(new Date(d.time));
-        }
-        return weatherScale(clouds);
-    })
-    .attr("cy", function(d) { return diffScale(d.diff); })
-    .attr("r", 2);
-
-
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .call(diffAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Total");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(weatherAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Clouds");
-}
-
-function scatter180(data) {
-    var openWeather = data.openWeather;
-    var everSolar = data.diff;
-
-    $("#Scatter180").empty();
-    var margin = 40;
-
-    var width = 500;
-    var height = 500;
-
-
-    var diffScale = d3.scale.linear();
-    diffScale.range([height, 0]);
-    diffScale.domain([0, d3.max(everSolar, function(d) {
-                             return d.diff;
-                           })]);
-
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([0, width]);
-    weatherScale.domain([0, d3.max(openWeather, function(d) {
-                                return d.clouds;
-                            })]);
-
-    var diffAxis = d3.svg.axis()
-                     .scale(diffScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("buttom");
-
-
-    var svg = d3.select("#Scatter180").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
-
-    svg.append("g")
-    .attr("class", "dot")
-    .selectAll("circle")
-    .data(everSolar).enter()
-    .append("circle")
-    .filter(function(d) {
-        return hasDataTime(openWeather, d.time, 11000000) && hasDataTime(everSolar, d.time, 11000000)
-    })
-    .attr("cx", function(d) {
-        var clouds = getClouds(openWeather, d.time);
-        if (clouds == undefined) {
-            console.log(new Date(d.time));
-        }
-        return weatherScale(clouds);
-    })
-    .attr("cy", function(d) { return diffScale(d.diff); })
-    .attr("r", 2);
-
-
-
-    svg.append("g")
-    .attr("class", "y axis")
-    .call(diffAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Total");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(weatherAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Clouds");
 }
 
 function totalScatter(data) {
@@ -842,40 +412,20 @@ function totalScatter(data) {
             });
         }
     }
-    console.log(combined);
-    $("#TotalScatter").empty();
+
     var margin = 40;
 
     var width = 500;
     var height = 500;
 
+    var totalScale = getLinearScale(height, 0, combined, function(d) { return d.total; })
+    var weatherScale = getLinearScale(0, width, combined, function(d) { return d.clouds; })
 
-    var totalScale = d3.scale.linear();
-    totalScale.range([height, 0]);
-    totalScale.domain([0, d3.max(combined, function(d) {
-                               return d.total;
-                           })]);
+    var svg = getSvg("#TotalScatter", width, height, margin);
 
-    var weatherScale = d3.scale.linear();
-    weatherScale.range([0, width]);
-    weatherScale.domain([0, d3.max(combined, function(d) {
-                                return d.clouds;
-                            })]);
+    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
+    appendAxis(svg, width, height, totalScale, "black", "left", "Total")
 
-    var totalAxis = d3.svg.axis()
-                     .scale(totalScale)
-                     .orient("left");
-
-    var weatherAxis = d3.svg.axis()
-                      .scale(weatherScale)
-                      .orient("buttom");
-
-
-    var svg = d3.select("#TotalScatter").append("svg")
-              .attr("width", width + 2 * margin)
-              .attr("height", height + 2 * margin)
-              .append("g")
-              .attr("transform", "translate(" + margin + "," + margin + ")");
 
     svg.append("g")
     .attr("class", "dot")
@@ -886,21 +436,4 @@ function totalScatter(data) {
     .attr("cy", function(d) { return totalScale(d.total); })
     .attr("r", 2)
 
-    svg.append("g")
-    .attr("class", "y axis")
-    .call(totalAxis)
-    .append("text")
-    .attr("y", -10)
-    .attr("text-anchor", "end")
-    .text("Total");
-
-    svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(weatherAxis)
-    .append("text")
-    .attr("x", width)
-    .attr("y", 30)
-    .attr("text-anchor", "end")
-    .text("Clouds");
 }
