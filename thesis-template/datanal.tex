@@ -1,13 +1,39 @@
 The expected data is to see a clear connection between the output of a
 PV and clouds\citep{southafrica}.  The aparant view of things the data
-also seem to have a correlation as can be seen on figure \ref{fig:cloudsAndPower}.
+also seem to have a correlation as can be seen on figure
+\ref{fig:cloudsAndPower}.  It seems likely from the graph that there
+is some correlation, between the clouds and the PV system, as there's
+a tendency for the effect to drop when there's more clouds.
 
 \begin{figure}[h]
   \centering
   \includegraphics{dummy.jpg}
-  \caption{Cloud cover and averages of power generated (10 minute intervals)}
+  \caption{Cloud cover and averages of power generated (10 minute
+    intervals)}
   \label{fig:cloudsAndPower}
 \end{figure}
+
+However further analysis puts some doubt to that.  The blue line in
+figure \ref{fig:cloudsAndPower} shows the optimal effect measured at a
+given point of time in the day.  To test that hypothesis a scatter
+plot comparing how far from the optimal the power generation is
+compared to the cloud coverage.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{dummy.jpg}
+  \caption{Scatter plot from comparing effect, cloud coverage and
+    optimal effect}
+  \label{fig:fractiles}
+\end{figure}
+
+\todo{Boxplot comments, more analysis}
+
+Having a larger area of PV systems can smooth out noise in the data
+\citep{cloudsAndPower} and it is thus likely that having an area with
+more panels would even out the data in meaningful way.  Since we're
+still interested in the cloud coverage, it would still have to be
+local areas, such as a small village or similar.
 
 %%% Local Variables:
 %%% mode: latex
