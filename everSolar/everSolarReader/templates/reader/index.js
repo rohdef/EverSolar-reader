@@ -16,6 +16,7 @@ function ajaxCall(path, callback) {
 }
 function update() {
     ajaxCall("/data",diagram);
+    ajaxCall("/noise",noise);
     ajaxCall("/total",function(data){
         total(data);
         totalScatter(data);
@@ -198,6 +199,39 @@ function appendTimeLine(svg, color, timeScale, yScale, data, gety, defined) {
     appendLine(svg, color, timeScale, yScale, data,
                function(d) { return new Date(d.time) },
                gety, defined)
+}
+
+function noise(data) {
+    var openWeather = filter(data.openWeather);
+    var everSolar = filter(data.everSolar);
+
+    var margin = 40;
+
+    var width = $(window).width() - 200;
+    var height = 500;
+
+    var effectColor = "green";
+    var weatherColor = "red";
+
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar]);
+    var effectScale = getLinearScale(height, 0, everSolar, function(d) { return d.output; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
+
+    var svg = getSvg("#noise", width, height, margin);
+
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, effectScale, effectColor, "left", "Effect")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
+
+
+    appendTimeLine(svg, weatherColor, timeScale, weatherScale, openWeather,
+                   function(d) { return d.clouds; },
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         notNight(new Date(d.time)))});
+
+    appendTimeLine(svg, effectColor, timeScale, effectScale, everSolar,
+                   function(d) { return d.output},
+                   function(d) { return hasData(everSolar, d.time); });
 }
 
 function diagram(data) {

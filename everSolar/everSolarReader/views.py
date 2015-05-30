@@ -19,6 +19,13 @@ def data(request):
     })
     return HttpResponse(data,content_type='application/json')
 
+def noise(request):
+    data = json.dumps({
+        "openWeather" : history.getWeatherData(),
+        "everSolar" : history.getPVdata(0),
+    })
+    return HttpResponse(data,content_type='application/json')
+
 def total(request):
     data = json.dumps({
         "openWeather" : history.getAverageClouds(),

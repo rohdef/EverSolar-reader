@@ -29,22 +29,24 @@ def getPVdata(averageInterval):
                         hour=parts[3], minute=parts[4], second=parts[5]).timestamp()
         if intervalStart is None:
             intervalStart = timestamp
-
-        if (intervalStart + averageInterval * 60) < timestamp:
-            temp = average(intervalData)
-            temp["inverter"] = d[2]
-            resData.append(temp)
-            intervalData = []
-            intervalStart = timestamp
+            
+#        if (intervalStart + averageInterval * 60) < timestamp:
+#            temp = average(intervalData)
+#            temp["inverter"] = d[2]
+#            resData.append(temp)
+#            intervalData = []
+#            intervalStart = timestamp
 
         if last is None:
             last = [timestamp, d[1], d[2]]
         else:
             if (last[0] == timestamp) and (last[2] != d[2]):
                 intervalData.append([timestamp, last[1] + d[1]])
+                resData.append({"time": round(timestamp)*1000, "output": last[1] + d[1]})
                 last = None
             else:
                 intervalData.append(last)
+                resData.append({"time": round(timestamp)*1000, "output": last[1]})
                 last = [timestamp, d[1], d[2]]
 
     return resData
