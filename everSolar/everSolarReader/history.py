@@ -11,7 +11,7 @@ def average(data):
     return {"time": round(timestamp)*1000, "output": round((sum / len(data)))}
 
 def getPVdata(averageInterval):
-    cursor = connections['everSolar'].cursor()
+    cursor = connections['postgres'].cursor()
     cursor.execute("SELECT timestamp, pac, serial_number FROM inverter")
     data = cursor.fetchall()
     resData = []
@@ -50,9 +50,8 @@ def getPVdata(averageInterval):
     return resData
 
 def getWeatherData():
-    cursor = connections['openWeather'].cursor()
-    cursor.execute("SELECT recievetime, clouds FROM openweather "
-                    + "WHERE cityName = 'Stoholm' OR cityName = 'Karup' ORDER BY recievetime")
+    cursor = connections['postgres'].cursor()
+    cursor.execute("SELECT recievetime, clouds FROM weather_monsted ORDER BY recievetime")
     data = cursor.fetchall()
     
     resData = []
@@ -63,7 +62,7 @@ def getWeatherData():
     return resData
 
 def getTotalProductionPerDay():
-    cursor = connections['everSolar'].cursor()
+    cursor = connections['postgres'].cursor()
     cursor.execute("SELECT timestamp, serial_number, e_today FROM inverter")
     data = cursor.fetchall()
     
@@ -104,9 +103,8 @@ def getTotalProductionPerDay():
     return resData
 
 def getAverageClouds():
-    cursor = connections['openWeather'].cursor()
-    cursor.execute("SELECT recievetime, clouds FROM openweather "
-                    + "WHERE cityName = 'Stoholm' OR cityName = 'Karup'")
+    cursor = connections['postgres'].cursor()
+    cursor.execute("SELECT recievetime, clouds FROM weather_monsted ORDER BY recievetime")
     data = cursor.fetchall()
     
     resData = []
