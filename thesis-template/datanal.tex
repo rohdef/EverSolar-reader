@@ -6,19 +6,35 @@ The approach will be to first off confirm that it's likely to be true
 and then refining the data for the purpose to confirm or refute this
 hypothesis.
 
-By plotting the raw data
-The apparent view of things the data also seem to have a correlation
-as can be seen on figure \ref{fig:cloudsAndPower}.  It seems likely
-from the graph that there is some correlation, between the clouds and
-the PV system, as there's a tendency for the effect to drop when
-there's more clouds.
+By plotting the raw data in figure \ref{fig:noise} it can be seen that
+the cloud effect data from the PV system is indeed very noisy.  The
+fluctuations are so extreme that in themselves they only tell us that
+the solar panels are affected a lot by small things.  The cloud data
+is less noisy, since OpenWeatherMap provides coarser data, and even if
+they didn't it's fairly safe to assume that cloud coverage (at least
+under normal circumstances) won't change radically in short intervals.
 
 \begin{figure}
   \centering
   \includegraphics{dummy.jpg}
-  \caption{Noisy unfiltered data}
+  \caption{The raw cloud and effect data, as can be seen the effect
+    contains a huge amount of noise.}
   \label{fig:noise}
 \end{figure}
+
+To make the data correlate better and to even out the noise on the
+effects, the data is averaged over time intervals.  This evens out a
+lot of the small fluctuations, we consider it likely from the level of
+sensitivity that it's things like small clouds, flocks of birds and
+all the other small things that temporarily block sunlight that are
+the causes.
+
+This results in figure \ref{fig:cloudsAndPower}, where the maximal
+effect from this time of the day during the period of data collection
+is added.  There seems to be a hint of a correlation, as for most of
+the data points with cloudy weather the effect seems to be further
+from the optimal and with less cloudy closer to the optimal, but it
+seems only to be a hint, since the data is still rather noisy.
 
 \begin{figure}
   \centering
@@ -28,18 +44,38 @@ there's more clouds.
   \label{fig:cloudsAndPower}
 \end{figure}
 
-However further analysis puts some doubt to that.  The blue line in
-figure \ref{fig:cloudsAndPower} shows the optimal effect measured at a
-given point of time in the day.  To test that hypothesis a scatter
-plot comparing how far from the optimal the power generation is
-compared to the cloud coverage.
+A lot of experiments were done to find the a way to make the data more
+useful, as expected the intervals used doesn't make much of a
+difference, as long as they are big enough to even out the worst
+fluctuations (around 10 min) and small enough to stay without each
+cloud measurement (<= 30 mins).  The lowest 5\% of the data has been
+capped, since the fluctuations close to this margin is very noisy,
+probably due to the low margins, experiments has been done with other
+margins, but at 10\% the data doesn't change much and at higher rates,
+it seems that too many correct data get filtered too.
 
-\begin{figure}[h]
+As part of the refinement process a scatter plot was added, to make it
+clearer if there's any relation.  The plot shows a hint of a relation,
+but nothing more, it's way too vague to conclude anything.  In the
+scatter plot on figure \ref{fig:scatter30} that uses 30 min intervals
+the data is extremely noisy, whereas on scatter plot for 2 hour
+intervals on figure \ref{fig:scatter120} seems to have a clearer
+connection, but may have too few data points for reliable conclusions.
+
+\begin{figure}
   \centering
   \includegraphics{dummy.jpg}
   \caption{Scatter plot from comparing effect, cloud coverage and
-    optimal effect}
-  \label{fig:fractiles}
+    optimal effect, using averages over 30 mins}
+  \label{fig:scatter30}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{dummy.jpg}
+  \caption{Scatter plot from comparing effect, cloud coverage and
+    optimal effect, using averages over 2 hours}
+  \label{fig:scatter120}
 \end{figure}
 
 \todo{Boxplot comments, more analysis}
