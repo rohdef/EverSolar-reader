@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^diff30/$', views.diff30, name='diff30'),
     url(r'^diff60/$', views.diff60, name='diff60'),
     url(r'^diff180/$', views.diff180, name='diff180'),
+    url(r'^cloudStats/$', views.cloudStats, name='cloudStats'),
+    url(r'^cloudStatsIntervals/$', views.cloudStatsIntervals, name='cloudStatsIntervals'),
 ]

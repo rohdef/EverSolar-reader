@@ -186,3 +186,51 @@ def getDiff(interval):
         })
     
     return resData
+
+def getCloudStats():
+        cursor = connections['postgres'].cursor()
+        cursor.execute("SELECT mean, std_dev_plus, std_dev_minus, clouds FROM cloud_stats2 ORDER BY clouds")
+        data = cursor.fetchall()
+
+        resData = []
+        for d in data:
+            resData.append({
+                "clouds" : float(d[3]),
+                "mean" : float(d[0]) * 100,
+                "std_dev_plus" : float(d[1]) * 100,
+                "std_dev_minus" : float(d[2]) * 100,
+            })
+
+        return resData
+
+
+def getCloudStatsTimeIntervals(interval):
+        cursor = connections['postgres'].cursor()
+        cursor.execute("SELECT mean, std_dev_plus, std_dev_minus, clouds FROM cloud_stats_" + interval + " ORDER BY clouds")
+        data = cursor.fetchall()
+
+        resData = []
+        for d in data:
+            
+            noNone = True
+
+            for e in d:
+                if e is None:
+                    noNone = False
+            
+            if noNone:
+                resData.append({
+                    "clouds" : float(d[3]),
+                    "mean" : float(d[0]) * 100,
+                    "std_dev_plus" : float(d[1]) * 100,
+                    "std_dev_minus" : float(d[2]) * 100,
+                })
+            else:
+                resData.append({
+                    "clouds" : float(d[3]),
+                    "mean" : float(d[0]) * 100,
+                    "std_dev_plus" : d[1],
+                    "std_dev_minus" : d[2],
+                })
+
+        return resData

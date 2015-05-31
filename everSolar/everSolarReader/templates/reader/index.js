@@ -35,6 +35,16 @@ function update() {
         scatter(data, "#Scatter180", 180);
         //diffFullData(data);
     });
+    ajaxCall("/cloudStats", function(data) {
+        cloudStats(data,"#CloudStats");
+    });
+
+    ajaxCall("/cloudStatsIntervals",function(data){
+        cloudStats(data["06_10"], "#CloudStats_06_10");
+        cloudStats(data["10_14"], "#CloudStats_10_14");
+        cloudStats(data["14_18"], "#CloudStats_14_18");
+    });
+
 }
 
 
@@ -409,20 +419,28 @@ function scatter(data, selector, interval) {
 
     var deadTime = (interval * 60 + 1000) * 1000
 
+    var counter = 0;
+
     svg.append("g")
     .attr("class", "dot")
     .selectAll("circle")
     .data(everSolar).enter()
     .append("circle")
     .filter(function(d) {
-        return (hasDataTime(openWeather, d.time, deadTime) &&
-                hasDataTime(everSolar, d.time, deadTime));
+        var bool = (hasDataTime(openWeather, d.time, deadTime) &&
+                    hasDataTime(everSolar, d.time, deadTime))
+        if (bool) {
+            counter++;
+        }
+        return bool;
     })
     .attr("cx", function(d) {
         return weatherScale(getClouds(openWeather, d.time));
     })
     .attr("cy", function(d) { return diffScale(d.diff); })
     .attr("r", 2);
+
+    console.log("Scatter" + interval + ": " + counter);
 
 }
 
@@ -470,4 +488,88 @@ function totalScatter(data) {
     .attr("cy", function(d) { return totalScale(d.total); })
     .attr("r", 2)
 
+}
+/*
+function cloudStats(data) {
+    var margin = 40;
+
+    var width = 500;
+    var height = 500;
+
+    var meanColor = "green";
+    var stdDevColor = "red";
+
+    var meanScale = getLinearScale(height, 0, data, function(d) {
+                        return Math.max(d.mean, d.std_dev_plus, d.std_dev_minus);
+                    })
+    var weatherScale = getLinearScale(0, width, data, function(d) { return d.clouds; })
+
+    var svg = getSvg("#CloudStats", width, height, margin);
+
+    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
+    appendAxis(svg, width, height, meanScale, "black", "left", "Effect")
+
+
+    appendLine(svg, meanColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.mean; },
+               function(d) { return true});
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_plus},
+               function(d) { return true});
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_minus},
+               function(d) { return true});
+}*/
+
+function cloudStats(data, selector) {
+    var margin = 40;
+
+    var width = 500;
+    var height = 500;
+
+    var meanColor = "green";
+    var stdDevColor = "red";
+
+    var meanScale = getLinearScale(height, 0, data, function(d) {
+                        return Math.max(d.mean, d.std_dev_plus, d.std_dev_minus);
+                    })
+    var weatherScale = getLinearScale(0, width, data, function(d) { return d.clouds; })
+
+    var svg = getSvg(selector, width, height, margin);
+
+    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
+    appendAxis(svg, width, height, meanScale, "black", "left", "Effect")
+
+
+    appendLine(svg, meanColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.mean; },
+               function(d) { return true});
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_plus},
+               function(d) {
+                   if (d.std_dev_plus != null) {
+                       return true;
+                   } else {
+                       return false;
+                   }
+               });
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_minus},
+               function(d) {
+                   if (d.std_dev_plus != null) {
+                       return true;
+                   } else {
+                       return false;
+                   }
+               });
 }
