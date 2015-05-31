@@ -16,6 +16,7 @@ function ajaxCall(path, callback) {
 }
 function update() {
     ajaxCall("/data",diagram);
+    ajaxCall("/noise",noise);
     ajaxCall("/total",function(data){
         total(data);
         totalScatter(data);
@@ -34,6 +35,16 @@ function update() {
         scatter(data, "#Scatter180", 180);
         //diffFullData(data);
     });
+    ajaxCall("/cloudStats", function(data) {
+        cloudStats(data,"#CloudStats");
+    });
+
+    ajaxCall("/cloudStatsIntervals",function(data){
+        cloudStats(data["06_10"], "#CloudStats_06_10");
+        cloudStats(data["10_14"], "#CloudStats_10_14");
+        cloudStats(data["14_18"], "#CloudStats_14_18");
+    });
+
 }
 
 
@@ -198,6 +209,39 @@ function appendTimeLine(svg, color, timeScale, yScale, data, gety, defined) {
     appendLine(svg, color, timeScale, yScale, data,
                function(d) { return new Date(d.time) },
                gety, defined)
+}
+
+function noise(data) {
+    var openWeather = filter(data.openWeather);
+    var everSolar = filter(data.everSolar);
+
+    var margin = 40;
+
+    var width = $(window).width() - 200;
+    var height = 500;
+
+    var effectColor = "green";
+    var weatherColor = "red";
+
+    var timeScale = getTimeScale(0, width, [openWeather, everSolar]);
+    var effectScale = getLinearScale(height, 0, everSolar, function(d) { return d.output; })
+    var weatherScale = getLinearScale(height, 0, openWeather, function(d) { return d.clouds; })
+
+    var svg = getSvg("#noise", width, height, margin);
+
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, effectScale, effectColor, "left", "Effect")
+    appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
+
+
+    appendTimeLine(svg, weatherColor, timeScale, weatherScale, openWeather,
+                   function(d) { return d.clouds; },
+                   function(d) { return (hasData(openWeather, d.time) &&
+                                         notNight(new Date(d.time)))});
+
+    appendTimeLine(svg, effectColor, timeScale, effectScale, everSolar,
+                   function(d) { return d.output},
+                   function(d) { return hasData(everSolar, d.time); });
 }
 
 function diagram(data) {
@@ -375,20 +419,28 @@ function scatter(data, selector, interval) {
 
     var deadTime = (interval * 60 + 1000) * 1000
 
+    var counter = 0;
+
     svg.append("g")
     .attr("class", "dot")
     .selectAll("circle")
     .data(everSolar).enter()
     .append("circle")
     .filter(function(d) {
-        return (hasDataTime(openWeather, d.time, deadTime) &&
-                hasDataTime(everSolar, d.time, deadTime));
+        var bool = (hasDataTime(openWeather, d.time, deadTime) &&
+                    hasDataTime(everSolar, d.time, deadTime))
+        if (bool) {
+            counter++;
+        }
+        return bool;
     })
     .attr("cx", function(d) {
         return weatherScale(getClouds(openWeather, d.time));
     })
     .attr("cy", function(d) { return diffScale(d.diff); })
     .attr("r", 2);
+
+    console.log("Scatter" + interval + ": " + counter);
 
 }
 
@@ -436,4 +488,52 @@ function totalScatter(data) {
     .attr("cy", function(d) { return totalScale(d.total); })
     .attr("r", 2)
 
+}
+
+function cloudStats(data, selector) {
+    var margin = 40;
+
+    var width = 500;
+    var height = 500;
+
+    var meanColor = "green";
+    var stdDevColor = "red";
+
+    var meanScale = getLinearScale(height, 0, data, function(d) {
+                        return Math.max(d.mean, d.std_dev_plus, d.std_dev_minus);
+                    })
+    var weatherScale = getLinearScale(0, width, data, function(d) { return d.clouds; })
+
+    var svg = getSvg(selector, width, height, margin);
+
+    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
+    appendAxis(svg, width, height, meanScale, "black", "left", "Effect")
+
+
+    appendLine(svg, meanColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.mean; },
+               function(d) { return true});
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_plus},
+               function(d) {
+                   if (d.std_dev_plus != null) {
+                       return true;
+                   } else {
+                       return false;
+                   }
+               });
+
+    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
+               function(d) { return d.clouds; },
+               function(d) { return d.std_dev_minus},
+               function(d) {
+                   if (d.std_dev_plus != null) {
+                       return true;
+                   } else {
+                       return false;
+                   }
+               });
 }

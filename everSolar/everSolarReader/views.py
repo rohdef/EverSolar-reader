@@ -19,6 +19,13 @@ def data(request):
     })
     return HttpResponse(data,content_type='application/json')
 
+def noise(request):
+    data = json.dumps({
+        "openWeather" : history.getWeatherData(),
+        "everSolar" : history.getPVdata(0),
+    })
+    return HttpResponse(data,content_type='application/json')
+
 def total(request):
     data = json.dumps({
         "openWeather" : history.getAverageClouds(),
@@ -44,5 +51,16 @@ def diff180(request):
     data = json.dumps({
         "diff" : history.getDiff(180),
         "openWeather" : history.getWeatherData(),
+    })
+    return HttpResponse(data,content_type='application/json')
+
+def cloudStats(request):
+    return HttpResponse(json.dumps(history.getCloudStats()),content_type='application/json')
+
+def cloudStatsIntervals(request):
+    data = json.dumps({
+        "06_10" : history.getCloudStatsTimeIntervals("06_10"),
+        "10_14" : history.getCloudStatsTimeIntervals("10_14"),
+        "14_18" : history.getCloudStatsTimeIntervals("14_18"),
     })
     return HttpResponse(data,content_type='application/json')

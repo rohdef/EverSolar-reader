@@ -29,22 +29,24 @@ def getPVdata(averageInterval):
                         hour=parts[3], minute=parts[4], second=parts[5]).timestamp()
         if intervalStart is None:
             intervalStart = timestamp
-
-        if (intervalStart + averageInterval * 60) < timestamp:
-            temp = average(intervalData)
-            temp["inverter"] = d[2]
-            resData.append(temp)
-            intervalData = []
-            intervalStart = timestamp
+            
+#        if (intervalStart + averageInterval * 60) < timestamp:
+#            temp = average(intervalData)
+#            temp["inverter"] = d[2]
+#            resData.append(temp)
+#            intervalData = []
+#            intervalStart = timestamp
 
         if last is None:
             last = [timestamp, d[1], d[2]]
         else:
             if (last[0] == timestamp) and (last[2] != d[2]):
                 intervalData.append([timestamp, last[1] + d[1]])
+                resData.append({"time": round(timestamp)*1000, "output": last[1] + d[1]})
                 last = None
             else:
                 intervalData.append(last)
+                resData.append({"time": round(timestamp)*1000, "output": last[1]})
                 last = [timestamp, d[1], d[2]]
 
     return resData
@@ -184,3 +186,51 @@ def getDiff(interval):
         })
     
     return resData
+
+def getCloudStats():
+        cursor = connections['postgres'].cursor()
+        cursor.execute("SELECT mean, std_dev_plus, std_dev_minus, clouds FROM cloud_stats2 ORDER BY clouds")
+        data = cursor.fetchall()
+
+        resData = []
+        for d in data:
+            resData.append({
+                "clouds" : float(d[3]),
+                "mean" : float(d[0]) * 100,
+                "std_dev_plus" : float(d[1]) * 100,
+                "std_dev_minus" : float(d[2]) * 100,
+            })
+
+        return resData
+
+
+def getCloudStatsTimeIntervals(interval):
+        cursor = connections['postgres'].cursor()
+        cursor.execute("SELECT mean, std_dev_plus, std_dev_minus, clouds FROM cloud_stats_" + interval + " ORDER BY clouds")
+        data = cursor.fetchall()
+
+        resData = []
+        for d in data:
+            
+            noNone = True
+
+            for e in d:
+                if e is None:
+                    noNone = False
+            
+            if noNone:
+                resData.append({
+                    "clouds" : float(d[3]),
+                    "mean" : float(d[0]) * 100,
+                    "std_dev_plus" : float(d[1]) * 100,
+                    "std_dev_minus" : float(d[2]) * 100,
+                })
+            else:
+                resData.append({
+                    "clouds" : float(d[3]),
+                    "mean" : float(d[0]) * 100,
+                    "std_dev_plus" : d[1],
+                    "std_dev_minus" : d[2],
+                })
+
+        return resData
