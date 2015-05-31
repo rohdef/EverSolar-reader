@@ -16,7 +16,7 @@ under normal circumstances) won't change radically in short intervals.
 
 \begin{figure}
   \centering
-  \includegraphics{dummy.jpg}
+  \includesvg{test}
   \caption{The raw cloud and effect data, as can be seen the effect
     contains a huge amount of noise.}
   \label{fig:noise}
@@ -57,10 +57,12 @@ it seems that too many correct data get filtered too.
 As part of the refinement process a scatter plot was added, to make it
 clearer if there's any relation.  The plot shows a hint of a relation,
 but nothing more, it's way too vague to conclude anything.  In the
-scatter plot on figure \ref{fig:scatter30} that uses 30 min intervals
-the data is extremely noisy, whereas on scatter plot for 2 hour
-intervals on figure \ref{fig:scatter120} seems to have a clearer
-connection, but may have too few data points for reliable conclusions.
+scatter plot on figure \ref{fig:scatter30} that uses 30 minute
+intervals the data is extremely noisy, whereas on scatter plot for 60
+minute intervals on figure \ref{fig:scatter60} seems to have a clearer
+connection, but it is still too noisy.  A trial was done with even
+coarser data, but it turned out to have so few data points that is was
+virtually useless.
 
 \begin{figure}
   \centering
@@ -74,11 +76,13 @@ connection, but may have too few data points for reliable conclusions.
   \centering
   \includegraphics{dummy.jpg}
   \caption{Scatter plot from comparing effect, cloud coverage and
-    optimal effect, using averages over 2 hours}
-  \label{fig:scatter120}
+    optimal effect, using averages over 60 mins}
+  \label{fig:scatter60}
 \end{figure}
 
-\todo{Boxplot comments, more analysis}
+In mapping out the eventual connection between the percentage of the
+effect compared to the amount of clouds all the data points used in
+the 30 min scatter plot
 
 That a single PV system is very sensitive to even small changes can
 easily be seen following the green curve on figure \ref{fig:noise}.
