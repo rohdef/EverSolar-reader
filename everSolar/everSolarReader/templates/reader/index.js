@@ -489,42 +489,6 @@ function totalScatter(data) {
     .attr("r", 2)
 
 }
-/*
-function cloudStats(data) {
-    var margin = 40;
-
-    var width = 500;
-    var height = 500;
-
-    var meanColor = "green";
-    var stdDevColor = "red";
-
-    var meanScale = getLinearScale(height, 0, data, function(d) {
-                        return Math.max(d.mean, d.std_dev_plus, d.std_dev_minus);
-                    })
-    var weatherScale = getLinearScale(0, width, data, function(d) { return d.clouds; })
-
-    var svg = getSvg("#CloudStats", width, height, margin);
-
-    appendAxis(svg, width, height, weatherScale, "black", "buttom", "Clouds");
-    appendAxis(svg, width, height, meanScale, "black", "left", "Effect")
-
-
-    appendLine(svg, meanColor, weatherScale, meanScale, data,
-               function(d) { return d.clouds; },
-               function(d) { return d.mean; },
-               function(d) { return true});
-
-    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
-               function(d) { return d.clouds; },
-               function(d) { return d.std_dev_plus},
-               function(d) { return true});
-
-    appendLine(svg, stdDevColor, weatherScale, meanScale, data,
-               function(d) { return d.clouds; },
-               function(d) { return d.std_dev_minus},
-               function(d) { return true});
-}*/
 
 function cloudStats(data, selector) {
     var margin = 40;
