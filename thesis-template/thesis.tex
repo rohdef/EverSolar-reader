@@ -3,6 +3,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[american]{babel}
+\usepackage{svg}
 \usepackage{latexsym}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -16,7 +17,8 @@
 \usepackage{epstopdf}
 \usepackage{titling}
 \usepackage{listings}
-%\usepackage{minted}
+\usepackage{minted}
+\usepackage{graphicx}
 
 \newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
 
@@ -39,7 +41,7 @@
   \end{tabular}
   \\[2ex]
   \noindent\rule{\linewidth}{1mm}\\[4ex]
-  \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex]}
+  \noindent{\Large\sf IoT/P2P, Computer Science\\[1ex]}
   \end{center}
 }
 %\predate{}
@@ -93,15 +95,24 @@
 \section{Data analysis}
 \input{datanal.tex}
 
+\section{Improvements}
+\input{improv.tex}
+
 \section{Conclusion}
 \input{conclusion.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Acknowledgments}
-\todo{Lynderup senior - dad,
-  Bouvin - computer scientist, supervisor,
-  Karl Fischer - chemist}
+
+\begin{itemize}
+\item Niels Olof Bouvin and Matthias Nielsen - Guidance and help
+  during the project
+\item Karl Fischer - Guidance on the physics and chemistry behind
+  photovoltaic systems
+\item Lynderup senior - Provided access to solar panels
+\item Peter Laursen - Correction and feedback on the report
+\end{itemize}
 
 \section{Conclusion}
 \label{ch:conclusion}
