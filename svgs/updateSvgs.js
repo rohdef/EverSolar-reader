@@ -61,11 +61,12 @@ function update() {
         var svg = diagram(data, 10, 600, 300);
         writeToFile("diagram", svg);
     });
-/*
+
     ajaxCall("/noise/", function(data) {
-        noise(data, 5, 800, 500);
+        var svg = noise(data, 5, 600, 300);
+        writeToFile("noise", svg);
     });
-*/
+
 
     ajaxCall("/diff30/",function(data) {
         var svg = scatter(data, "#Scatter30", 30, 300, 300);
