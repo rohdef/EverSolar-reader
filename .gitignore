@@ -1,3 +1,6 @@
+#Svg temp files
+*svgs/*.pdf*
+
 #emacs
 *~
 *#*#
