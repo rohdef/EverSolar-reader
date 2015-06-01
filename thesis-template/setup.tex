@@ -1,32 +1,47 @@
-The setup which is used in this research paper is very simple. There are
-actually two setups, because there were a need to record cloud
-coverage data from somewhere, and at the same time there were a need
-to record solar panel data.
+The setup which is used to meassure the PV systems and to gather data
+is very simple.
 
-First setup which collects solar panel data is placed in a town named
-Mønsted which can be seen on a picture below. The setup consists of
-PV, inverter and raspberry pi, which collects data into a SQL
-database.
-
-The second setup which records cloud coverage data is placed inside
-Aarhus university, where a stationary computer is running and
-gathering data from OpenWeather.com api, and stores the data into
-a separate SQL database. The data which is gathered from the OpenWeather api
-comes from two different towns (Stoholm and Karup), where both towns are
-closest to the first setups placement, and there is no way to force the
-OpenWeather api to return data from the same town always.
-
-Finally, data from both setups are read into one main database where the data
-gets analyzed.
+For the logging of weather information a simple program was used to
+query OpenWeatherMap.org for weather information, and logging them
+into a database.  When OpenWeatherMap is queried based on GPS
+coordinates, the actual weatherstation is selected
+non-deterministicly.  Thus for Mønsted (where the solar panels are
+located), it actually alternates between two towns (Stoholm and Karup)
+for weather data as can be seen on figure \ref{fig:mapsPicture}.
 
 \begin{figure}[h]
   \centering
- % \includegraphics{MapsPicture.png}
- \includegraphics{dummy.jpg}
+  \includegraphics{MapsPicture.png}
   \caption{3 towns where data is recorded}
-      \label{fig:MapsPicture}
+  \label{fig:mapsPicture}
 \end{figure}
+
+At the PV system the serial interface of the inverter is used.  The
+setup is based on a Raspberry PI with an RS485 serial converter to
+connect to the inverter.  The setup is described in further detail at
+\url{https://code.google.com/p/eversolar-monitor/wiki/Hardware}.  The
+scematics can be seen on figure \ref{fig:hardware}.
+
+\begin{figure}[h]
+  \centering
+  % \includegraphics{MapsPicture.png}
+  \includegraphics{hardware.jpg}
+  \caption{Diagram over the harware setup}
+  \label{fig:hardware}
+\end{figure}
+
+The data gathered is initially logged at local databased, but once
+gathered is moved to full database server, normalizing the data, so
+they can be compared.  The database is used for more powerful
+functions such as dividing the data into intervals and doing simple
+statistic caluculations.
+
+Kasper <-
+
+Rohde <-
+
 %%% Local Variables:
 %%% mode: latex
+%%% TeX-command-extra-options: "-shell-escape"
 %%% TeX-master: "thesis"
 %%% End:
