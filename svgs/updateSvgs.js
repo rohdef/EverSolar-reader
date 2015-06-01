@@ -32,7 +32,25 @@ function ajaxCall(path, callback) {
 }
 
 function writeToFile(fileName, svg) {
-    var xmlStr = (new xmldom.XMLSerializer()).serializeToString(svg[0][0].ownerDocument)
+    var htmlsvg = svg.node().ownerDocument.getElementById("svg");
+
+
+    var docString = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\"><svg id=\"svg\" version=\"1.0\" xmlns=\"http://www.w3.org/2000/svg\"><defs><style type=\"text/css\"><![CDATA[.axis path,.axis line { fill: none; stroke: black; shape-rendering: crispEdges; } .axis text { font-family: sans-serif; font-size: 12px; } .line { stroke-width: 2; fill: none; } ]]></style> </defs></svg>"
+
+    var doc = new DOMParser().parseFromString(docString);
+    var svgElement = doc.getElementById("svg");
+
+    svgElement.setAttribute("width", htmlsvg.getAttribute("width"));
+    svgElement.setAttribute("height", htmlsvg.getAttribute("height"));
+    var children = htmlsvg.childNodes
+    for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        htmlsvg.removeChild(child);
+        svgElement.insertBefore(child, null);
+    }
+
+
+    var xmlStr = (new xmldom.XMLSerializer()).serializeToString(doc)
 
     fs.writeFile(fileName + ".svg" , xmlStr, function(){console.log('done')})
 
@@ -40,41 +58,42 @@ function writeToFile(fileName, svg) {
 
 function update() {
     ajaxCall("/data/", function(data) {
-        var svg = diagram(data, 30, 800, 500);
+        var svg = diagram(data, 10, 600, 300);
         writeToFile("diagram", svg);
     });
-/*
+
     ajaxCall("/noise/", function(data) {
-        noise(data, 5, 800, 500);
+        var svg = noise(data, 5, 600, 300);
+        writeToFile("noise", svg);
     });
-*/
+
 
     ajaxCall("/diff30/",function(data) {
-        var svg = scatter(data, "#Scatter30", 30, 500, 500);
+        var svg = scatter(data, "#Scatter30", 30, 300, 300);
         writeToFile("diff30", svg);
     });
 
     ajaxCall("/diff60/",function(data) {
-        var svg1 = scatter(data, "#Scatter60", 60, 500, 500);
-        var svg2 = diff(data, 30, 800, 500);
+        var svg1 = scatter(data, "#Scatter60", 60, 300, 300);
+        var svg2 = diff(data, 10, 600, 300);
         writeToFile("diff60", svg1);
         writeToFile("diff", svg2);
     });
 
     ajaxCall("/diff180/",function(data){
-        var svg = scatter(data, "#Scatter180", 180, 500, 500);
+        var svg = scatter(data, "#Scatter180", 180, 300, 300);
         writeToFile("diff180", svg);
         //diffFullData(data);
     });
     ajaxCall("/cloudStats/", function(data) {
-        var svg = cloudStats(data,"#CloudStats", 500, 500);
+        var svg = cloudStats(data,"#CloudStats", 300, 300);
         writeToFile("cloudStats", svg);
     });
 
     ajaxCall("/cloudStatsIntervals/",function(data){
-        var svg1 = cloudStats(data["06_10"], "#CloudStats_06_10", 500);
-        var svg2 = cloudStats(data["10_14"], "#CloudStats_10_14", 500);
-        var svg3 = cloudStats(data["14_18"], "#CloudStats_14_18", 500);
+        var svg1 = cloudStats(data["06_10"], "#CloudStats_06_10", 300, 300);
+        var svg2 = cloudStats(data["10_14"], "#CloudStats_10_14", 300, 300);
+        var svg3 = cloudStats(data["14_18"], "#CloudStats_14_18", 300, 300);
         writeToFile("cloudStats06_10", svg1);
         writeToFile("cloudStats10_14", svg2);
         writeToFile("cloudStats14_18", svg3);
@@ -171,16 +190,12 @@ function getLinearScale(start, end, data, getPoint) {
 }
 
 function getSvg(selector, width, height, margin) {
-    var docString = "<?xml version=\"1.0\" standalone=\"no\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\"><svg id=\"svg\" version=\"1.0\" xmlns=\"http://www.w3.org/2000/svg\"><defs><style type=\"text/css\"><![CDATA[.axis path,.axis line { fill: none; stroke: black; shape-rendering: crispEdges; } .axis text { font-family: sans-serif; font-size: 12px; } .line { stroke-width: 2; fill: none; } ]]></style> </defs></svg>"
-
-    //var doc = new DOMParser().parseFromString(docString);
-    var doc = jsdom(docString);
+    var doc = jsdom("<svg id=\"svg\"></svg>");
 
 
     var svgElement = doc.getElementById("svg");
 
-
-    var svg = d3.select(svgElement).append("svg")
+    var svg = d3.select(svgElement)
               .attr('width',  width + 2 * margin)
               .attr('height', height + 2 * margin)
               .append('g')
