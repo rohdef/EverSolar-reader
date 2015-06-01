@@ -11,7 +11,7 @@ for weather data as can be seen on figure \ref{fig:mapsPicture}.
 
 \begin{figure}[h]
   \centering
-  \includegraphics{MapsPicture.png}
+  \includegraphics{mapsPicture}
   \caption{3 towns where data is recorded}
   \label{fig:mapsPicture}
 \end{figure}
@@ -30,7 +30,7 @@ scematics can be seen on figure \ref{fig:hardware}.
   \label{fig:hardware}
 \end{figure}
 
-The data gathered is initially logged at local databased, but once
+The data gathered is initially logged at local database, but once
 gathered is moved to full database server, normalizing the data, so
 they can be compared.  The database is used for more powerful
 functions such as dividing the data into intervals and doing simple
@@ -39,10 +39,11 @@ D3 is then used to visualize the data, which is a lot easier if the data
 is the same place. Visualizing of the statistic is required to be able to 
 see any link between the data.
 
-
 The source code for the system is freely available on GitHub at
-\url{https://github.com/rohdef/EverSolar-reader}, access to the data
-gathered can be
+\url{https://github.com/rohdef/EverSolar-reader}, the data and
+aggregate functions is available from the PostgreSQL database located
+at \url{creepy.rohdef.dk} using the username ``iot'' and password
+``HEScVC555''.
 
 %%% Local Variables:
 %%% mode: latex
