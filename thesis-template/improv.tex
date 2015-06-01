@@ -1,5 +1,5 @@
-Given that PV systems react to photons and thus are affected by clouds
-and atmospheric disturbances indicates that we should be able to make
+PV systems react to photons and thus are affected by clouds
+and atmospheric disturbances.  This gives an indication that we should be able to make
 a connection between clouds and the effect of the panels
 \citep{photovoltaic}.  This claim is further backed by research being
 done to even out the noise from weather conditions, most notably
@@ -8,7 +8,7 @@ data analysis contrasts this leaves out three possible conclusions: 1)
 there actually is no such connection, 2) clouds do impact but too many
 other factors impact it to make any reliable information from clouds
 alone, and 3) there are errors in the way the data is collected.  As
-option seems very unlikely, both from the science behind PV systems
+option 1 seems very unlikely, both from the science behind PV systems
 and that research groups seem to be able to prove this
 \citep{southafrica, cloudTrack, photovoltaic}, it seems appropriate to
 take a look at option 2 and 3.
@@ -31,13 +31,13 @@ easily be seen following the green curve on figure \ref{fig:noise}.
 It's apparent from the amount of fluctuations that even small things
 can influence the effect.  Attempts to even out the effect from
 weather conditions, has successfully shown that both larger PV systems
-and larger area coverage can be used smooth the data from weather
+and larger area coverage can be used to smoothe the data from weather
 conditions \citep{cloudTrack,southafrica}.  This heavily indicates
 that using more PV systems could be useful.  Since the target here
 isn't to completely even the data, the balance between still having
 data and reducing the noise gathered.
 
-The approach to have a larger area of PV systems is used is used to
+The approach of having a larger area of PV systems is used is used to
 try and even out all noise caused from clouds.  Using large areas with
 multiple PV systems shows that areas of 250x250 and 500x500 km squares
 even out very large amounts of the data, but weather data is still
@@ -47,22 +47,22 @@ approach.  Doing this in a small city such as the one where the
 experiment is done would be fairly easy provided that people would
 allow collection of their data.
 
-Considering the claim that 1 MW solar panels responds rapidly to
+Considering the claim that 1 MW solar panels respond rapidly to
 changes in available sunlight \citep{cloudTrack} it is quite likely
-that one of the data in the experiment is quite simply too sensitive.
+that the data in the experiment is simply too sensitive.
 The usage of larger PV systems isn't a likely approach if using
 peoples personal systems on their roofs, since a personal system in
 Denmark is allowed to be max 3 kW, which is a fair deal lower than the
 1 MW system.  This however indicates that even very small disturbances
-will have an effect of the solar panels and thus simple renders faulty
+will have an effect on the solar panels and thus simply renders faulty
 data.
 
 Another possible cause for faulty data is the lack of precision of the
 weather data.  The data given for free from OpenWeatherMap.org is
-guaranteed to be updated a the latest every 2 hours.  Also the weather
-station doing the measurement isn't located exactly where the PV
-system is.  So it is quite possible that the ground truth data simply
-isn't good enough.
+guaranteed to be updated approximately every 2 hours (they may do it
+more often).  Also the weather station doing the measurement isn't
+located exactly where the PV system is.  So it is quite possible that
+the ground truth data simply isn't reliable enough.
 
 On a final note it would also be an improvement to have data over a
 longer period of time, as this would assist in either making it
@@ -71,11 +71,11 @@ start to show stronger tendencies towards a connection.
 
 There is plenty of room for improving the data gathered, both by
 trying to reduce the chance for potential direct errors but also to
-make other effects more apparent.  From the data here though it's too
+make other effects more apparent.  From the data gathered here, it is too
 early to conclude the lack of a connection between clouds an the
 effect from solar panels.
 
-Another point of improvements is to actually find out sun's role in energy production of PV, because every PV have an optimal sun angle where they receive optimal amount of sun light. Since optimal sun angle are known, suns placement on the sky at gathered data timestamps can be found, to calculate if there are actual a link between suns angle and PV power generation. 
+Another point of improvements is to actually find out the role of the sun in energy production of PV, because every PV have an optimal sun angle where they receive optimal amount of sun light.  Since the optimal angle of the sun is known, the placement of the sun on the sky at gathered data points can be found, to calculate if there is actually a link between the angle of the sun and PV power generation.
 
 %%% Local Variables:
 %%% mode: latex

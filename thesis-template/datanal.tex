@@ -1,23 +1,23 @@
-From the fact that PV systems is sensitive to the amount of photons
+From the fact that PV systems are sensitive to the amount of photons
 reaching them and that research has shown that larger scale PV systems
 and areas can be used to smooth out weather data the expected results
 show a clear connection \citep{southafrica, cloudTrack, photovoltaic}.
-The approach will be to first off confirm that it's likely to be true
-and then refining the data for the purpose to confirm or refute this
+The approach will be to firstly confirm that it's likely to be true
+and then refine the data for the purpose to confirm or refute this
 hypothesis.
 
 By plotting the raw data in figure \ref{fig:noise} it can be seen that
 the cloud effect data from the PV system is indeed very noisy.  The
-fluctuations are so extreme that in themselves they only tell us that
-the solar panels are affected a lot by small things.  The cloud data
-is less noisy, since OpenWeatherMap provides coarser data, and even if
-they didn't it's fairly safe to assume that cloud coverage (at least
-under normal circumstances) won't change radically in short intervals.
+fluctuations are so extreme that they only tell us that the solar
+panels are affected a lot by small things.  The cloud data is less
+noisy, since OpenWeatherMap provides coarser data, and even if they
+didn't it's fairly safe to assume that cloud coverage (at least under
+normal circumstances) won't change radically in short intervals.
 
 \begin{figure}
   \centering
   \includesvg[width=\textwidth]{test}
-  \caption{The raw cloud and effect data, as can be seen the effect
+  \caption{The raw cloud and effect data, as can be seen the figure
     contains a huge amount of noise.}
   \label{fig:noise}
 \end{figure}
@@ -27,7 +27,7 @@ effects, the data is averaged over time intervals.  This evens out a
 lot of the small fluctuations, we consider it likely from the level of
 sensitivity that it's things like small clouds, flocks of birds and
 all the other small things that temporarily block sunlight that are
-the causes.
+the causes of the noise.
 
 This results in figure \ref{fig:cloudsAndPower}, where the maximal
 effect from this time of the day during the period of data collection
@@ -44,15 +44,15 @@ seems only to be a hint, since the data is still rather noisy.
   \label{fig:cloudsAndPower}
 \end{figure}
 
-A lot of experiments were done to find the a way to make the data more
-useful, as expected the intervals used doesn't make much of a
+A lot of experiments were conducted to find a way to make the data
+more useful.  As expected the intervals used do not make much of a
 difference, as long as they are big enough to even out the worst
 fluctuations (around 10 min) and small enough to stay without each
 cloud measurement (<= 30 mins).  The lowest 5\% of the data has been
 capped, since the fluctuations close to this margin is very noisy,
-probably due to the low margins, experiments has been done with other
-margins, but at 10\% the data doesn't change much and at higher rates,
-it seems that too many correct data get filtered too.
+probably due to the low margins. Experiments have been conducted with
+other margins, but at 10\% the data do not change much and at higher
+rates, it seems that too many correct data get filtered out.
 
 As part of the refinement process a scatter plot was added, to make it
 clearer if there's any relation.  The plot shows a hint of a relation,
@@ -60,9 +60,9 @@ but nothing more, it's way too vague to conclude anything.  In the
 scatter plot on figure \ref{fig:scatter30} that uses 30 minute
 intervals the data is extremely noisy, whereas on scatter plot for 60
 minute intervals on figure \ref{fig:scatter60} seems to have a clearer
-connection, but it is still too noisy.  A trial was done with even
-coarser data, but it turned out to have so few data points that is was
-virtually useless.
+relation between the cloud cover an effect, but it is still too noisy.
+A trial was done with even coarser data, but it turned out to have so
+few data points that is was virtually useless.
 
 \begin{figure}
   \centering
@@ -80,11 +80,11 @@ virtually useless.
   \label{fig:scatter60}
 \end{figure}
 
-To uncover the eventual connection, between the percentage of the
+To uncover the eventual connection between the percentage of the
 effect compared to the amount of clouds all the data points used in
-the 30 min scatter plot (the other ratios yield similar results), a
+the 30 min scatter plot (the other ratios yield similar results),
 the means for the various effects and the standard deviation on the
-plus and minus side was mapped.  The plots in figure
+plus and minus side were mapped.  The plots in figure
 \ref{fig:stattotal} seems to indicate extremely vague connections in
 the data.  It should be noted that the data at 100\% clouds are
 unreliable as there are very few readings there.  Apart from the very
@@ -128,22 +128,22 @@ nothing but a hint.
   \label{fig:stat1418}
 \end{figure}
 
-During the day the day the sun will hit the solar panels at different
-angles, this may have an effect on the how the panels generate power,
-the plots with the mean compared to the standard deviation has also
-been compared as seen in figure \ref{fig:stat0610}, \ref{fig:stat1014}
-and \ref{fig:stat1418}.  The graphs however still don't indicate a
-further connection between the cloud levels and the effect from the PV
-system.  The standard deviations seems to be lower, but that is most
-likely due to the smaller data sets in consideration.
+During the day the sun will hit the solar panels at different angles.
+This may have an effect on the how the panels generate power, the
+plots with the mean compared to the standard deviation have also been
+compared as seen in figure \ref{fig:stat0610}, \ref{fig:stat1014} and
+\ref{fig:stat1418}.  The graphs however still do not indicate a further
+connection between the cloud levels and the effect from the PV system.
+The standard deviations seem to be lower, but that is most likely due
+to the smaller data sets in consideration.
 
 From the given data analysis it seems impossible to draw any
 conclusions to a connection between the power generated by a PV system
 and cloud coverage.  This result is in contrast to the expected
-result, the data has proven to be way to noisy to draw any
-conclusions.  Throughout the analysis there seem to be a slight hint,
-so further analysis may be able to show a connection, by finding a way
-to reduce the noise.
+result.  The data has proven to be way to noisy too draw any
+conclusions.  Throughout the analysis there seems to be a slight hint,
+so further data analysis may be able to show a connection, by finding
+a way to reduce the noise.
 
 %%% Local Variables:
 %%% mode: latex
