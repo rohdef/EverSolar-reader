@@ -145,7 +145,7 @@ function getSvg(selector, width, height, margin) {
     return svg;
 }
 
-function appendAxis(svg, width, height, scale, color, orient, text){
+function appendAxis(svg, width, height, scale, color, orient, text, timeDayIntervels){
 
     var translate;
     var x;
@@ -176,7 +176,9 @@ function appendAxis(svg, width, height, scale, color, orient, text){
     var axis = d3.svg.axis()
                .scale(scale)
                .orient(orient);
-//.ticks(d3.time.day, 1)
+    if (timeDayIntervels) {
+        axis.ticks(d3.time.day, 1)
+    }
 
     svg.append("g")
     .attr("class", "axis")
@@ -229,7 +231,7 @@ function noise(data) {
 
     var svg = getSvg("#noise", width, height, margin);
 
-    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time", true);
     appendAxis(svg, width, height, effectScale, effectColor, "left", "Effect")
     appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
@@ -264,7 +266,7 @@ function diagram(data) {
 
     var svg = getSvg("#Diagram", width, height, margin);
 
-    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time", true);
     appendAxis(svg, width, height, effectScale, effectColor, "left", "Effect")
     appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
@@ -302,7 +304,7 @@ function diffFullData(data) {
 
     var svg = getSvg("#DiffFullData", width, height, margin);
 
-    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time", true);
     appendAxis(svg, width, height, diffScale, diffColor, "left", "Effect")
     appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
@@ -336,7 +338,7 @@ function diff(data) {
 
     var svg = getSvg("#Diff", width, height, margin);
 
-    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time", true);
     appendAxis(svg, width, height, diffScale, diffColor, "left", "Effect")
     appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 
@@ -395,7 +397,7 @@ function total(data) {
     .attr("height", function(d) { return height - weatherScale(d.clouds); })
     .attr("fill", weatherColor)
 
-    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time");
+    appendAxis(svg, width, height, timeScale, "black", "buttom", "Time", true);
     appendAxis(svg, width, height, totalScale, totalColor, "left", "Total")
     appendAxis(svg, width, height, weatherScale, weatherColor, "right", "Clouds")
 }
