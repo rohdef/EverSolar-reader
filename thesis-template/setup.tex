@@ -25,7 +25,7 @@ scematics can be seen on figure \ref{fig:hardware}.
 \begin{figure}[h]
   \centering
   % \includegraphics{MapsPicture.png}
-  \includegraphics{hardware.jpg}
+  \includegraphics[width=1\textwidth]{hardware}
   \caption{Diagram over the harware setup}
   \label{fig:hardware}
 \end{figure}
@@ -34,7 +34,10 @@ The data gathered is initially logged at local database, but once
 gathered is moved to full database server, normalizing the data, so
 they can be compared.  The database is used for more powerful
 functions such as dividing the data into intervals and doing simple
-statistic calculations.
+statistic caluculations.
+D3 is then used to visualize the data, which is a lot easier if the data 
+is the same place. Visualizing of the statistic is required to be able to 
+see any link between the data.
 
 The source code for the system is freely available on GitHub at
 \url{https://github.com/rohdef/EverSolar-reader}, the data and
