@@ -1,25 +1,24 @@
-From the fact that PV systems are sensitive to the amount of photons
+From the fact that PV systems is sensitive to the amount of photons
 reaching them and that research has shown that larger scale PV systems
 and areas can be used to smooth out weather data the expected results
 show a clear connection \citep{southafrica, cloudTrack, photovoltaic}.
-The approach is confirming that it's likely that there is a connection
-between clouds and the effect from PVs, and then refine the data for
-the purpose to confirm or refute this hypothesis.
+The approach will be to first off confirm that it's likely to be true
+and then refining the data for the purpose to confirm or refute this
+hypothesis.
 
 By plotting the raw data in figure \ref{fig:noise} it can be seen that
 the cloud effect data from the PV system is indeed very noisy.  The
-fluctuations are so extreme that they only tell us that the solar
-panels are affected a lot by small things.  The cloud data is less
-noisy, since OpenWeatherMap provides coarser data, and even if they
-didn't it's fairly safe to assume that cloud coverage (at least under
-normal circumstances) won't change radically in short intervals.
+fluctuations are so extreme that in themselves they only tell us that
+the solar panels are affected a lot by small things.  The cloud data
+is less noisy, since OpenWeatherMap provides coarser data, and even if
+they didn't it's fairly safe to assume that cloud coverage (at least
+under normal circumstances) won't change radically in short intervals.
 
 \begin{figure}
   \centering
-  \tiny
-  \includesvg[width=\textwidth]{noise}
-  \caption{The raw clouds (\%) and effect (W) data, as can be seen the
-    figure contains a huge amount of noise.}
+  \includegraphics{dummy.jpg}
+  \caption{The raw cloud and effect data, as can be seen the effect
+    contains a huge amount of noise.}
   \label{fig:noise}
 \end{figure}
 
@@ -28,7 +27,7 @@ effects, the data is averaged over time intervals.  This evens out a
 lot of the small fluctuations, we consider it likely from the level of
 sensitivity that it's things like small clouds, flocks of birds and
 all the other small things that temporarily block sunlight that are
-the causes of the noise.
+the causes.
 
 This results in figure \ref{fig:cloudsAndPower}, where the maximal
 effect from this time of the day during the period of data collection
@@ -39,130 +38,71 @@ seems only to be a hint, since the data is still rather noisy.
 
 \begin{figure}
   \centering
-  \tiny
-  \includesvg[width=\textwidth]{diagram}
-  \caption{Cloud cover (\%) and averages of power (W) generated (10 minute
+  \includegraphics{dummy.jpg}
+  \caption{Cloud cover and averages of power generated (10 minute
     intervals)}
   \label{fig:cloudsAndPower}
 \end{figure}
 
-A lot of experiments were conducted to find a way to make the data
-more useful.  As expected the intervals used do not make much of a
+A lot of experiments were done to find the a way to make the data more
+useful, as expected the intervals used doesn't make much of a
 difference, as long as they are big enough to even out the worst
 fluctuations (around 10 min) and small enough to stay without each
 cloud measurement (<= 30 mins).  The lowest 5\% of the data has been
 capped, since the fluctuations close to this margin is very noisy,
-probably due to the low margins. Experiments have been conducted with
-other margins, but at 10\% the data do not change much and at higher
-rates, it seems that too many correct data points get filtered out.
+probably due to the low margins, experiments has been done with other
+margins, but at 10\% the data doesn't change much and at higher rates,
+it seems that too many correct data get filtered too.
 
 As part of the refinement process a scatter plot was added, to make it
 clearer if there's any relation.  The plot shows a hint of a relation,
 but nothing more, it's way too vague to conclude anything.  In the
-scatter plot on figure \ref{fig:scatter30} that uses 30 minute
-intervals the data is extremely noisy, whereas on scatter plot for 60
-minute intervals on figure \ref{fig:scatter60} seems to have a clearer
-relation between the cloud cover an effect, but it is still too noisy.
-A trial was done with even coarser data, but it turned out to have so
-few data points that is was virtually useless.
+scatter plot on figure \ref{fig:scatter30} that uses 30 min intervals
+the data is extremely noisy, whereas on scatter plot for 2 hour
+intervals on figure \ref{fig:scatter120} seems to have a clearer
+connection, but may have too few data points for reliable conclusions.
 
 \begin{figure}
   \centering
-  \tiny
-  \includesvg[width=\textwidth]{diff30}
-  \caption{Scatter plot from comparing effect, cloud coverage (\%) and
-    optimal effect, using averages over 30 mins.  The effect is \%
-    from expected max.}
+  \includegraphics{dummy.jpg}
+  \caption{Scatter plot from comparing effect, cloud coverage and
+    optimal effect, using averages over 30 mins}
   \label{fig:scatter30}
 \end{figure}
 
 \begin{figure}
   \centering
-  \tiny
-  \includesvg[width=\textwidth]{diff60}
-  \caption{Scatter plot from comparing effect, cloud coverage (\%) and
-    optimal effect, using averages over 60 mins.  The effect is \%
-    from expected max.}
-  \label{fig:scatter60}
+  \includegraphics{dummy.jpg}
+  \caption{Scatter plot from comparing effect, cloud coverage and
+    optimal effect, using averages over 2 hours}
+  \label{fig:scatter120}
 \end{figure}
 
-To uncover the eventual connection between the percentage of the
-effect compared to the amount of clouds all the data points used in
-the 30 min scatter plot (the other ratios yield similar results),
-the means for the various effects and the standard deviation on the
-plus and minus side were mapped.  The plots in figure
-\ref{fig:stattotal} seems to indicate extremely vague connections in
-the data.  It should be noted that the data at 100\% clouds are
-unreliable as there are very few readings there.  Apart from the very
-strange outlier at 24\% there could be a vague hint of a connection,
-but even if the outlier is just a ``fluke'' in the data, it is still
-nothing but a hint.
+\todo{Boxplot comments, more analysis}
 
-\begin{figure}
-  \centering
-  \tiny
-  \includesvg[width=\textwidth]{cloudStats}
-  \caption{The green line is the mean of the effect/max for the given
-    cloud coverage and red are mean $\pm$ standard deviation.  The
-    date covers the entire data set.  The effect is percent out of
-    expected max and clouds is percent cloud coverage.}
-  \label{fig:stattotal}
-\end{figure}
+That a single PV system is very sensitive to even small changes can
+easily be seen following the green curve on figure \ref{fig:noise}.
+It's apparent from the amount of fluctuations that even small things
+can influence the effect.  Both \citep{cloudTrack} and
+\citep{southafrica} has data confirming that small scale PV systems
+are easily affected by things such as clouds, they still look at large
+systems in comparison with a personal system.  Thus it is likely that
+even a flock of birds can influence it.
 
-\begin{figure}
-  \centering
-  \tiny
-  \includesvg[width=\textwidth]{cloudStats06_10}
-  \caption{The green line is the mean of the effect/max for the given
-    cloud coverage and red are mean $\pm$ standard deviation.  The
-    date covers the data from the time ranges from 6.00-10.00.  The
-    effect is percent out of expected max and clouds is percent cloud
-    coverage.}
-  \label{fig:stat0610}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \tiny
-  \includesvg[width=\textwidth]{cloudStats10_14}
-  \caption{The green line is the mean of the effect/max for the given
-    cloud coverage and red are mean $\pm$ standard deviation.  The
-    date covers the data from the time ranges from 10.00-14.00.  The
-    effect is percent out of expected max and clouds is percent cloud
-    coverage.}
-  \label{fig:stat1014}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \tiny
-  \includesvg[width=\textwidth]{cloudStats14_18}
-  \caption{The green line is the mean of the effect/max for the given
-    cloud coverage and red are mean $\pm$ standard deviation.  The
-    date covers the data from the time ranges from 14.00-18.00..  The
-    effect is percent out of expected max and clouds is percent cloud
-    coverage.}
-  \label{fig:stat1418}
-\end{figure}
-
-During the day the sun will hit the solar panels at different angles.
-This may have an effect on the how much power the panels generate.
-The plots with the mean compared to the standard deviation have also
-been compared in time intervals of the as seen in figure
-\ref{fig:stat0610}, \ref{fig:stat1014} and \ref{fig:stat1418}, to see
-if minizing the impact from the angle shows any improvements.  The
-graphs however still do not indicate a further connection between the
-cloud levels and the effect from the PV system.  The standard
-deviations seem to be lower, but that is most likely due to the
-smaller data sets in consideration.
-
-From the given data analysis it seems impossible to draw any
-conclusions to a connection between the power generated by a PV system
-and cloud coverage.  This result is in contrast to the expected
-result.  The data has proven to be way to noisy too draw any
-conclusions.  Throughout the analysis there seems to be a slight hint,
-so further data analysis may be able to show a connection, by finding
-a way to reduce the noise.
+A larger area of PV systems and bigger PV systems can smooth out noise
+in the data \citep{southafrica,cloudTrack}.  The effect of larger
+systems could be interesting if they can be accessed, for the approach
+of this project it would be an interesting addition to get access to
+more systems.  The approach to have a larger area of PV systems is
+used is used to try and even out all noise caused from clouds
+\citep{southafrica}, where the intend here would be to even out some,
+such that conclusions about correlation about the weather and effect
+can be made.  The fact that the weather impact can be smoothed a lot,
+when it's done over areas of 250x250 and 500x500 km squares, but
+weather data is still quite apparent on 50x50 km squares
+\citep{southafrica}, indicates both that a larger area than a single
+PV system will smooth the data, but without loosing the stronger
+connection with weather data as long as the area is relatively small.
 
 %%% Local Variables:
 %%% mode: latex
